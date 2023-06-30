@@ -1,0 +1,73 @@
+1. Reproduce lock wait
+		On session 1 - db2 "create table t1 (slno int not null primary key)"; db2 +c " insert into t1 values(1)"
+		On session 2 - db2 set isolation level=RR; db2 "select * from t1"
+
+
+2. Diagnosing lock wait with snapshot
+	
+	2.1 list applications show detail
+		db2 list applications show detail
+	2.2 get snapshot
+		db2 get snapshot for application agentid 1839 > waitlocksnapshot.out
+	2.3 Find application which is holding lock
+		ID of agent holding lock                 =
+	2.4 Get snapshot for application holding lock
+		db2 get snapshot for application agentid <appl-handl> > holdlocksnapshot.out
+
+
+3 Diagnosing lock wait with Monitoring Table Functions
+	
+	3.1 List locks With mon_get_locks
+		db2 "select * from table(mon_get_locks(null,-2))"
+	3.2 List table locks
+		db2 "select * from table(mon_get_locks(CLOB('<lock_object_type>TABLE</lock_object_type>'),-2))"
+		db2 "select * from table(mon_get_locks(CLOB('<table_schema>DB2INST1</table_schema><table_name>T1</table_name>'),-2))"
+
+		Find application handle from output
+
+	3.3 List waiting locks
+		db2 "select * from table(MON_GET_APPL_LOCKWAIT(null,-2))"
+		Find holding application handle from output
+	3.4 List Current activities
+		db2 "SELECT t.application_handle, t.uow_id, t.activity_id,VARCHAR(t.stmt_text, 256) as stmt_text FROM table(MON_GET_ACTIVITY(NULL,-1)) as t"
+
+
+4 Diagnosing Lock timeouts with event monitor
+
+	4.1 Set Lock Timeout to 30. 
+	4.2 db2 CREATE EVENT MONITOR MYLOCKS FOR LOCKING WRITE TO TABLE
+	4.3 Activate event monitor 
+		db2 set event monitor MYLOCKS state 1
+	4.4 Repeat step 1 to Reproduce Lock Wait
+	4.5 Fetch data from the tables after lock timeout
+		SELECT DISTINCT CAST(STMT_TEXT AS VARCHAR(40)) STMT, LP.PARTICIPANT_NO,VARCHAR(LP.APPL_NAME,10) APPL_NAME, LP.LOCK_MODE_REQUESTED,LP.PARTICIPANT_TYPE FROM LOCK_PARTICIPANT_ACTIVITIES_MYLOCKS AS LPA JOIN LOCK_PARTICIPANTS_MYLOCKS AS LP ON LPA.EVENT_ID = LP.EVENT_ID;
+
+5. Unformatted Event Tables
+
+	5.1 	db2 "CREATE BUFFERPOOL BP32K IMMEDIATE SIZE 2500 AUTOMATIC PAGESIZE 32 K"
+
+		db2 "CREATE LARGE TABLESPACE TBSP32K PAGESIZE 32 K BUFFERPOOL BP32K DROPPED TABLE RECOVERY ON"
+
+		db2 "CREATE SYSTEM TEMPORARY TABLESPACE TEMP32K PAGESIZE 32 K BUFFERPOOL BP32K"
+	5.2 db2 "CREATE EVENT MONITOR myevmon FOR LOCKING  WRITE TO UNFORMATTED EVENT TABLE (TABLE UELOCKS IN TBSP32K) "
+	5.3 db2 "SET EVENT MONITOR myevmon STATE 1"
+	5.4 Reproduce Locking
+	5.5 db2 "CALL EVMON_FORMAT_UE_TO_TABLES ('LOCKING', NULL, NULL, NULL, NULL, NULL, NULL, -1, 'SELECT * FROM UELOCKS')"
+	5.6 db2 "SELECT DISTINCT CAST(STMT_TEXT AS VARCHAR(40)) STMT, LP.PARTICIPANT_NO, VARCHAR(LP.APPL_NAME,10) APPL_NAME, LP.LOCK_MODE_REQUESTED,LP.PARTICIPANT_TYPE FROM LOCK_PARTICIPANT_ACTIVITIES AS LPA JOIN LOCK_PARTICIPANTS AS LP ON LPA.XMLID = LP.XMLID"
+
+
+6. Diagnosing Lock waits with db2pd
+
+	6.1 Diagnosing a lockwait
+		db2pd -db test -locks -transactions -applications -dynamic
+	6.2  Waiting locks
+		db2pd -wlocks -db test
+	6.3 Application info
+		db2pd -apinfo app-handl -db test
+	6.4  Mapping an application to a dynamic SQL statement
+		db2pd -applications -dynamic
+		
+	
+	
+
+		

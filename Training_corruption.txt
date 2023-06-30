@@ -1,0 +1,606 @@
+We have a test database "CORRUPT1" where in we intentionally introduce corruption to few objects for learning.
+In this exercise we try to see how db behaves and reports error messages (SQL codes), errors logged in db2diag, what we get in db2dart report etc.
+We use db2dart utility to salvage data and make object accessible in scenarios where all other options are not feasible.
+
+db2 connect to CORRUPT1
+-- Check tablespaces
+[db2inst1@Rohitlnx1 ~]$ db2 "select b.TBSPACEID, substr(B.TBSPACE,1,15) tbsp_name from syscat.tablespaces B order by 1 with ur"
+
+TBSPACEID   TBSP_NAME
+----------- ---------------
+          0 SYSCATSPACE
+          1 TEMPSPACE1
+          2 USERSPACE1
+          3 TS1
+          4 TS2
+          5 TS3
+          6 TS4
+          7 TS5
+          8 TS6
+          9 TS7
+         10 TS8
+         11 TS9
+         12 TS10
+         13 TS11
+         14 TS12
+         15 TS13
+         16 TS14
+         18 SYSTOOLSPACE
+
+  18 record(s) selected.
+
+-- Tablespace states
+[db2inst1@Rohitlnx1 ~]$ db2 list tablespaces | grep State
+ State                                = 0x0000
+ State                                = 0x0000
+ State                                = 0x0000
+ State                                = 0x0000
+ State                                = 0x0000
+ State                                = 0x0000
+ State                                = 0x0000
+ State                                = 0x0000
+ State                                = 0x0000
+ State                                = 0x0000
+ State                                = 0x0000
+ State                                = 0x0000
+ State                                = 0x0000
+ State                                = 0x0000
+ State                                = 0x0000
+ State                                = 0x0000
+ State                                = 0x0000
+ State                                = 0x0000
+
+-- get list of non-normal tbsps if any.
+db2 list tablespaces | grep State|grep -v 0x0000
+
+-- List of tables and its tablespace.
+[db2inst1@Rohitlnx1 ~]$ db2 "select b.TBSPACEID, substr(B.TBSPACE,1,15) tbsp_name , TABLEID, rtrim(substr(A.tabschema,1,10)) ||'.'|| rtrim(substr(A.tabname,1,15)) schema_table_name from syscat.tablespaces B left outer join syscat.tables A on A.TBSPACEID=b.TBSPACEID where a.type='T' and b.TBSPACE <> 'SYSCATSPACE' order by 1 with ur"
+
+TBSPACEID   TBSP_NAME       TABLEID SCHEMA_TABLE_NAME
+----------- --------------- ------- --------------------------
+          3 TS1                   4 DB2INST1.T1_BAK
+          3 TS1                   5 DB2INST1.T1
+          4 TS2                   4 DB2INST1.T2_BAK
+          4 TS2                   5 DB2INST1.T2
+          5 TS3                   4 DB2INST1.T3
+          6 TS4                   4 DB2INST1.T4
+          7 TS5                   4 DB2INST1.T5
+          8 TS6                   4 DB2INST1.T6
+          9 TS7                   4 DB2INST1.T7
+         10 TS8                   4 DB2INST1.T8
+         11 TS9                   4 DB2INST1.T9
+         12 TS10                  4 DB2INST1.T10
+         13 TS11                  4 DB2INST1.T11
+         14 TS12                  4 DB2INST1.TAB1
+         14 TS12                  5 DB2INST1.TAB2
+         14 TS12                  6 DB2INST1.TAB3
+         14 TS12                  7 DB2INST1.TAB4
+         14 TS12                  8 DB2INST1.TAB5
+         14 TS12                  9 DB2INST1.TAB6
+         14 TS12                 10 DB2INST1.TAB7
+         14 TS12                 11 DB2INST1.TAB8
+         14 TS12                 12 DB2INST1.TAB9
+         14 TS12                 13 DB2INST1.TAB10
+         14 TS12                 14 DB2INST1.TAB11
+         14 TS12                 15 DB2INST1.TAB12
+         14 TS12                 16 DB2INST1.TAB13
+         14 TS12                 17 DB2INST1.TAB14
+         14 TS12                 18 DB2INST1.TAB15
+         14 TS12                 19 DB2INST1.TAB16
+         14 TS12                 20 DB2INST1.TAB17
+         14 TS12                 21 DB2INST1.TAB18
+         14 TS12                256 DB2INST1.TAB19
+         14 TS12                257 DB2INST1.TAB20
+         15 TS13                  4 DB2INST1.T13
+         15 TS13                  5 DB2INST1.T14
+         16 TS14                  4 DB2INST1.EX17_1
+         16 TS14                  5 DB2INST1.EX17_2
+         18 SYSTOOLSPACE          4 SYSTOOLS.POLICY
+         18 SYSTOOLSPACE          5 SYSTOOLS.HMON_ATM_INFO
+         18 SYSTOOLSPACE          6 SYSTOOLS.HMON_COLLECTION
+
+  40 record(s) selected.
+
+-- Archive db2diag.log file
+db2diag -A
+
+/home/db2inst1/sqllib/db2dump/DIAG0000/db2diag.log
+
+#### Tablespace EMP corruption
+https://www.ibm.com/docs/en/db2/11.5?topic=space-dms-table-maps
+
+[db2inst1@Rohitlnx1 ~]$ db2 "select * from DB2INST1.T7"
+SQL1007N  Error in finding pages for an object in a table space.
+SQLSTATE=58034
+
+db2 "? SQL1007N"
+
+
+SQL1007N  Error in finding pages for an object in a table space.
+
+Explanation:
+
+There are corrupted internal database pages or internal logic error for
+a table space.
+
+User response:
+
+Discontinue use of the object or table space. Contact IBM service to
+inspect the object and the table space.
+
+sqlcode: -1007
+
+sqlstate: 58034
+
+
+2023-03-29-09.11.34.552981-420 I2108E1322            LEVEL: Severe
+PID     : 2108596              TID : 139807237859072 PROC : db2sysc 0
+INSTANCE: db2inst1             NODE : 000            DB   : CORRUPT1
+APPHDL  : 0-7                  APPID: *LOCAL.db2inst1.230329160328
+AUTHID  : DB2INST1             HOSTNAME: Rohitlnx1.fyre.ibm.com
+EDUID   : 22                   EDUNAME: db2agent (CORRUPT1) 0
+FUNCTION: DB2 UDB, data management, loadDMSDescFromOTR, probe:9176
+MESSAGE : ZRC=0x8402001B=-2080243685=SQLB_EMP_MAP_INFO_NOT_FOUND
+          "EMP MAP INFO NOT FOUND"
+DATA #1 : String, 35 bytes
+Page 0 of object cannot be accessed
+DATA #2 : Object descriptor, PD_TYPE_SQLB_OBJECT_DESC, 104 bytes
+    Obj: {pool:9;obj:4;type:0} Parent={9;4}
+    lifeLSN:       00000000000B5F83
+    tid:           0 0  0
+    extentAnchor:                  96
+    initEmpPages:                   0
+    poolPage0:                      0
+    poolflags:   0x              3122
+    objectState: 0x             80025
+    lastSMP:                        0
+  pageSize:                    4096
+  extentSize:                    32
+  bufferPoolID:                   1
+  partialHash:               262153
+  objDescAttributes:                  0
+  objDescEHLState: 0x00007f271fd497d8
+  bufferPool:    0x00007f2711a25120
+  pdef:          0x00007f27158a6c00
+
+2023-03-29-09.11.34.553240-420 I3431E581             LEVEL: Warning
+PID     : 2108596              TID : 139807237859072 PROC : db2sysc 0
+INSTANCE: db2inst1             NODE : 000            DB   : CORRUPT1
+APPHDL  : 0-7                  APPID: *LOCAL.db2inst1.230329160328
+AUTHID  : DB2INST1             HOSTNAME: Rohitlnx1.fyre.ibm.com
+EDUID   : 22                   EDUNAME: db2agent (CORRUPT1) 0
+FUNCTION: DB2 UDB, catcache support, sqlrlc_systables_fetch_from_disk, probe:320
+MESSAGE : ZRC=0x8402001B=-2080243685=SQLB_EMP_MAP_INFO_NOT_FOUND
+          "EMP MAP INFO NOT FOUND"
+
+db2diag -rc 0x8402001B
+
+db2dart CORRUPT1 /RPT . /RPTN db_CORRUPT1.rpt
+-- Check Whole Database: 
+db2dart SAMPLE /DB /RPT . /RPTN SAMPLE.rpt 
+-- Check Single Table:
+db2dart SAMPLE /T /TSI 1 /OI 131 /RPT . /RPTN SAMPLE_p1_o131.rpt
+-- For tablespace Single Table
+db2dart sample /TS /TSI 2 /RPT . /RPTN SAMPLE_TS_2.rpt
+
+https://www.ibm.com/support/pages/node/501779
+-- db2dart command as per above link
+db2dart CORRUPT1 /DP /TSI 9 /PS 0 /NP 1 /V Y
+
+-- We get below o/p in db2dart 
+      Tablespace inspection phase start. Pool: 9
+
+         Tablespace-info inspection phase start.
+            Checking Table space ID: 9
+            Name            =   TS7
+            Extent size     =   32
+            # of containers =   1
+
+            Container names:
+               /home/db2inst1/db2inst1/NODE0000/CORRUPT1/T0000009/C0000000.LRG
+
+            Traversing extent map for object type: 0
+
+            Data inspection phase start. Data obj: 65535  In pool: 9
+            Data inspection phase end.
+
+
+            Traversing extent map for:
+              OTR ID: 4
+               Parent  object ID = 4  pool ID = 9
+              For all table objects in tablespace: 9
+
+               DAT extent anchor: 96, in pool: 9
+               Traversing extent map for object type: 0
+            Error: Unable to determine pool relative page number for obj rel page 0 (Obj ID:4, Pool ID:9) due to rc 0x8402001B
+            Error: Unable to read pool page 0, object page 0, from pool 9, due to rc 0x8402001B
+            Error: parent pool 9, object ID 4, object type Data.
+            Error: extent map anchor page of object is 96.
+               Warning: get page 0 of this DAT object failed with -79.
+
+-- Recovery options for data page corruptions
+https://www.ibm.com/support/pages/node/501779
+
+(note, for EMP page corruptions, dropping and recreating the object is not possible since access to all EMP pages for the object is required to fully traverse it).
+i) tablespace level restore and rollforward to end of logs.
+ii) database level restore and rollforward to end of logs.
+iii) drop all objects within the tablespace, drop the tablespace, recreate the tablespace, recreate all objects within the tablespace. repopulate all objects within the tablespace.
+
+
+db2 drop tablespace TS7
+=======================
+
+#### Table corruption
+
+TBSPACEID   TBSP_NAME       TABLEID SCHEMA_TABLE_NAME
+----------- --------------- ------- --------------------------
+          3 TS1                   4 DB2INST1.T1
+          4 TS2                   4 DB2INST1.T2
+          5 TS3                   4 DB2INST1.T3
+          6 TS4                   4 DB2INST1.T4
+          7 TS5                   4 DB2INST1.T5
+          8 TS6                   4 DB2INST1.T6
+          9 TS7                   4 DB2INST1.T7
+         10 TS8                   4 DB2INST1.T8
+         11 TS9                   4 DB2INST1.T9
+         12 TS10                  4 DB2INST1.T10
+         13 TS11                  4 DB2INST1.T11
+         14 TS12                  4 DB2INST1.TAB1
+         14 TS12                  5 DB2INST1.TAB2
+         14 TS12                  6 DB2INST1.TAB3
+         14 TS12                  7 DB2INST1.TAB4
+         14 TS12                  8 DB2INST1.TAB5
+         14 TS12                  9 DB2INST1.TAB6
+         14 TS12                 10 DB2INST1.TAB7
+         14 TS12                 11 DB2INST1.TAB8
+         14 TS12                 12 DB2INST1.TAB9
+         14 TS12                 13 DB2INST1.TAB10
+         14 TS12                 14 DB2INST1.TAB11
+         14 TS12                 15 DB2INST1.TAB12
+         14 TS12                 16 DB2INST1.TAB13
+         14 TS12                 17 DB2INST1.TAB14
+         14 TS12                 18 DB2INST1.TAB15
+         14 TS12                 19 DB2INST1.TAB16
+         14 TS12                 20 DB2INST1.TAB17
+         14 TS12                 21 DB2INST1.TAB18
+         14 TS12                256 DB2INST1.TAB19
+         14 TS12                257 DB2INST1.TAB20
+         15 TS13                  4 DB2INST1.T13
+         15 TS13                  5 DB2INST1.T14
+         16 TS14                  4 DB2INST1.EX17_1
+         16 TS14                  5 DB2INST1.EX17_2
+         18 SYSTOOLSPACE          4 SYSTOOLS.POLICY
+         18 SYSTOOLSPACE          5 SYSTOOLS.HMON_ATM_INFO
+         18 SYSTOOLSPACE          6 SYSTOOLS.HMON_COLLECTION
+
+  38 record(s) selected.
+
+db2 "select * from DB2INST1.T1"
+C1          C2
+----------- ------------------------------
+          1 string1
+          2 string2
+          3 string3
+          4 string4
+..
+..
+         61 string61
+         62 string62
+SQL1655C  The operation could not be completed due to an error accessing data
+on disk.  SQLSTATE=58030
+
+db2inst1@maddest1.fyre.ibm.com=>db2 "? SQL1655C"
+
+
+SQL1655C  The operation could not be completed due to an error accessing
+      data on disk.
+
+Explanation:
+
+The failure to complete the operation is due to a problem in accessing
+data on a disk. The SQL statement has been rolled back or the operation
+has been aborted. The database remains accessible.
+
+User response:
+
+The application can retry the operation, although it may continue to
+fail. If the operation continues to fail, it may be necessary to contact
+the DB2 system administrator to investigate further.
+
+Check the administration notification log for details that may help to
+diagnose the problem. Investigate the errors and determine the cause,
+possibly involving IBM Software Support.
+
+If DB2 data is determined to be in error, then restore and rollforward
+the table space or database.
+
+If hardware or other software is determined to be the cause, repair the
+systems involved (possibly requiring a DB2 outage).
+
+sqlcode: -1655
+
+sqlstate: 58030
+
+
+2023-03-29-11.03.16.035276-420 I2333E1077            LEVEL: Severe
+PID     : 7524                 TID : 140404657743616 PROC : db2sysc 0
+INSTANCE: db2inst1             NODE : 000            DB   : CORRUPT1
+APPHDL  : 0-35                 APPID: *LOCAL.db2inst1.230329180221
+UOWID   : 4                    ACTID: 1
+AUTHID  : DB2INST1             HOSTNAME: maddest1.fyre.ibm.com
+EDUID   : 22                   EDUNAME: db2agent (CORRUPT1) 0
+FUNCTION: DB2 UDB, buffer pool services, sqlb_verify_page, probe:5803
+MESSAGE : ZRC=0x86020019=-2046689255=SQLB_CSUM "Bad Page, Checksum Error"
+          DIA8426C A invalid page checksum was found for page "".
+DATA #1 : String, 27 bytes
+CheckSum verification error
+DATA #2 : String, 50 bytes
+CheckSum values from the page header on disk are :
+DATA #3 : unsigned integer, 4 bytes
+920982028
+DATA #4 : unsigned integer, 4 bytes
+3734710698
+DATA #5 : String, 68 bytes
+CheckSum values calculated from the page, following the read, are :
+DATA #6 : unsigned integer, 4 bytes
+920982028
+DATA #7 : unsigned integer, 4 bytes
+3717935594
+
+db2inst1@maddest1.fyre.ibm.com=>db2diag -rc 0x86020019
+
+Input ZRC string '0x86020019' parsed as 0x86020019 (-2046689255).
+
+ZRC value to map: 0x86020019 (-2046689255)
+        V7 Equivalent ZRC value: 0xFFFFE119 (-7911)
+
+ZRC class :
+        Critical Media Error (Class Index: 6)
+Component:
+        SQLB ; buffer pool services (Component Index: 2)
+Reason Code:
+        25 (0x0019)
+
+Identifer:
+        SQLB_CSUM
+Identifer (without component):
+        SQLZ_RC_CSUM
+
+Description:
+        Bad Page, Checksum Error
+
+Associated information:
+        Sqlcode -980
+SQL0980C  A disk error occurred.  Subsequent SQL statements cannot be
+processed.
+
+        Number of sqlca tokens : 0
+        Diaglog message number: 8426
+
+
+2023-03-29-11.03.21.037929-420 E8443E781             LEVEL: Warning
+PID     : 7524                 TID : 140404657743616 PROC : db2sysc 0
+INSTANCE: db2inst1             NODE : 000            DB   : CORRUPT1
+APPHDL  : 0-35                 APPID: *LOCAL.db2inst1.230329180221
+UOWID   : 4                    ACTID: 1
+AUTHID  : DB2INST1             HOSTNAME: maddest1.fyre.ibm.com
+EDUID   : 22                   EDUNAME: db2agent (CORRUPT1) 0
+FUNCTION: DB2 UDB, buffer pool services, sqlbReadPage, probe:1199
+MESSAGE : ADM6006E  The database manager encountered an error while reading
+          page "129" from table space "3" for object "4" (located at offset
+          "161" of container
+          "/home/db2inst1/db2inst1/NODE0000/CORRUPT1/T0000003/C0000000.LRG").
+
+https://www.ibm.com/support/pages/db2-backup-database-fails-sql1655c
+-- db2dart complete report for DB
+db2dart CORRUPT1 /DB /RPT . /RPTN CORRUPT1_complete.rpt 
+
+      Table inspection start: DB2INST1.T1
+
+         Data inspection phase start. Data obj: 4  In pool: 3
+         Error: CSUM read error for pool page 129, from object ID 4, pool 3,
+         Error: BPS Tail incorrect CBITS value -- (a)
+         Error: in page 1, pool page 129, of Object 4, in tablespace 3.
+         Error: CSUM read error for pool page 129, from object ID 4, pool 3,
+         Page contents dumped with CBITS intact.
+         Error: Page data will be dumped to report.
+
+           000       *3000 D00F 0100 0000 0005 002A 0300 0000*   *0...............*
+           010       *8100 0000 0400 0000 0000 0000 FFFF FFFF*   *................*
+           020       *025B 0600 0000 0000 0C12 E536 EA31 9BDD*   *...........6.1..*
+           030       *                                           **
+           030  000  *5700 1A00 0000 0000 2C00 C700 0000 0000*   *W...............*
+           040  010  *0000 0000 900F 640F 380F 0C0F E00E B40E*   *......d.8.......*
+
+https://www.ibm.com/support/pages/db2-luw-simple-steps-which-might-help-getting-rid-corrupted-pages
+-- Extract table data 
+db2dart CORRUPT1 /DDEL
+The db2dart command can be used to verify the architectural correctness of databases and the objects within them. 
+https://www.ibm.com/docs/en/db2/11.5?topic=commands-db2dart-database-analysis-reporting-tool
+/DDEL
+Dumps formatted table data in delimited ASCII format. Requires four input values: a table object ID or table name, table space ID, page number to start with, and number of pages.
+For column-organized tables, the /DDEL parameter accepts a range of logical row numbers instead of a range of pages. The logical row number uniquely identifies a row in a column-organized table and is analogous to a RID in a row-organized table. If both the first logical row number and the number of logical rows are 0, all rows in the column-organized table are dumped. If only the number of logical rows is 0, all rows from first logical row number to the last row of the table are dumped.
+
+The dumped delimited ASCII file is encoded in the database code page. The db2dart command does not perform code page conversions.
+
+The /DDEL parameter supports only the following column data types. If a table contains columns with any other data type, the column is skipped and not included in the delimited ASCII file.
+SMALLINT
+FLOAT
+REAL
+INTEGER
+TIME
+DECIMAL
+CHAR()
+VARCHAR()
+DATE
+TIMESTAMP
+BIGINT
+
+$ db2dart CORRUPT1 /DDEL
+
+   Table object data formatting start.
+   Please enter
+Table ID or name, tablespace ID, first page or logical row, num of pages or logical rows:
+(may suffix page number with 'p' for pool relative if working with a pool-relative tablespace)
+4,3,0,9999
+
+   2 of 2 columns in the table will be dumped.
+   Column numbers and datatypes of the columns dumped:
+         0  INTEGER
+         1  CHAR() -FIXED LENGTH CHARACTER STRING
+   Default filename for output data file is CORRUPT1_TS3T4.DEL,
+do you wish to change filename used? y/n
+n
+
+
+Sometime we can't even drop the table
+For example :
+
+db2inst1@maddest1.fyre.ibm.com=>db2 drop table DB2INST1.T10
+DB21034E  The command was processed as an SQL statement because it was not a
+valid Command Line Processor command.  During SQL processing it returned:
+SQL1655C  The operation could not be completed due to an error accessing data
+on disk.  SQLSTATE=58030
+
+2023-03-29-22.25.18.395161-420 I1065150E1774         LEVEL: Severe
+PID     : 62348                TID : 139676937611008 PROC : db2sysc 0
+INSTANCE: db2inst1             NODE : 000            DB   : CORRUPT1
+APPHDL  : 0-7                  APPID: *LOCAL.db2inst1.230330052453
+AUTHID  : DB2INST1             HOSTNAME: maddest1.fyre.ibm.com
+EDUID   : 22                   EDUNAME: db2agent (CORRUPT1) 0
+FUNCTION: DB2 UDB, data management, sqldLoadSubDMSDescFromChildOTR, probe:10358
+MESSAGE : ZRC=0x8402008F=-2080243569=SQLB_READERR
+          "Non-critical I/O or verification error encountered during page read from disk."
+DATA #1 : String, 37 bytes
+Failed loading DMS object descriptor!
+DATA #2 : DMS Single Object Descriptor, PD_TYPE_SQLD_OBJTAB_DESC, 24 bytes
+   datapoolID                    12
+   objectID                      4
+   extentAnchor                  160
+   poolPage0                     0
+   objectState                   SQLD_OBJ_EXIST
+   objectType                    INX
+   life_lsn                      00000000000CE831
+DATA #3 : Object descriptor, PD_TYPE_SQLB_OBJECT_DESC, 104 bytes
+    Obj: {pool:12;obj:4;type:1} Parent={12;4}
+    lifeLSN:       00000000000CE831
+
+Mark Table BAD: (drop pending)
+db2inst1@maddest1.fyre.ibm.com=>db2dart CORRUPT1 /MT
+
+Please enter Table ID or name, tablespace ID, and password:
+4,12,<password>
+
+db2inst1@maddest1.fyre.ibm.com=>db2 "select count(*) from DB2INST1.T10"
+
+1
+-----------
+SQL1477N  For table "DB2INST1.T10" an object "4" in table space "12" cannot be
+accessed.  SQLSTATE=55019
+
+db2 drop table DB2INST1.T10
+
+=====================================
+#### Index corruption
+
+db2 "select * from DB2INST1.T3"
+db2inst1@maddest1.fyre.ibm.com=>db2 "select c1 from DB2INST1.T3 order by c1"
+SQL1655C  The operation could not be completed due to an error accessing data
+on disk.  SQLSTATE=58030
+
+$ db2 describe indexes for table DB2INST1.T3
+
+Index                           Index               Unique         Number of      Index                       Index          Null
+schema                          name                rule           columns        type                        partitioning   keys
+------------------------------- ------------------- -------------- -------------- --------------------------- -------------- ------
+DB2INST1                        I1                  D                           1 RELATIONAL DATA             -              Y
+DB2INST1                        I2                  D                           1 RELATIONAL DATA             -              Y
+DB2INST1                        I3                  D                           2 RELATIONAL DATA             -              Y
+
+  3 record(s) selected.
+
+db2inst1@maddest1.fyre.ibm.com=>db2 describe indexes for table DB2INST1.T3 show detail
+
+Index     Index  Unique         Number of      Index                       Index          Null   Index           Data               Max Varchar     Xml                                                                                                                                                                                                                                                                                                                                                                                                                                    BUSINESS_TIME        Column
+schema    name   rule           columns        type                        partitioning   keys   ID              type       Hashed  Length          pattern                                                                                                                                                                                                                                                                                                                                                                                                                                WITHOUT OVERLAPS     names
+--------- ------ -------------- -------------- --------------------------- -------------- ------ --------------- ---------- ------- --------------- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -------------------- --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+DB2INST1  I1     D                           1 RELATIONAL DATA             -              Y                    1 -          -                     - -                                                                                                                                                                                                                                                                                                                                                                                                                                      NO                   +C1
+DB2INST1  I2     D                           1 RELATIONAL DATA             -              Y                    2 -          -                     - -                                                                                                                                                                                                                                                                                                                                                                                                                                      NO                   +C2
+DB2INST1  I3     D                           2 RELATIONAL DATA             -              Y                    3 -          -                     - -                                                                                                                                                                                                                                                                                                                                                                                                                                      NO                   +C1+C2
+
+  3 record(s) selected.
+
+db2inst1@maddest1.fyre.ibm.com=>db2 "select c1 from DB2INST1.T3 order by c1"
+SQL1655C  The operation could not be completed due to an error accessing data
+on disk.  SQLSTATE=58030
+
+2023-03-29-11.26.12.084493-420 I50903E6187           LEVEL: Severe
+PID     : 9265                 TID : 140419765626624 PROC : db2sysc 0
+INSTANCE: db2inst1             NODE : 000            DB   : CORRUPT1
+APPHDL  : 0-21                 APPID: *LOCAL.db2inst1.230329182200
+AUTHID  : DB2INST1             HOSTNAME: maddest1.fyre.ibm.com
+EDUID   : 45                   EDUNAME: db2agent (CORRUPT1) 0
+FUNCTION: DB2 UDB, buffer pool services, sqlb_verify_page, probe:5
+MESSAGE : ZRC=0x87020036=-2029912010=SQLB_BADHDR "Bad Page Header"
+          DIA8547C An error occurred in a database page header.
+DATA #1 : String, 64 bytes
+Error encountered trying to read a page - information follows :
+DATA #2 : String, 23 bytes
+Page verification error
+DATA #3 : Page ID, PD_TYPE_SQLB_PAGE_ID, 4 bytes
+202
+DATA #4 : Object descriptor, PD_TYPE_SQLB_OBJECT_DESC, 104 bytes
+    Obj: {pool:5;obj:4;type:1} Parent={5;4}
+    lifeLSN:       0000000000080A3E
+    tid:           0 0  0
+    extentAnchor:                 160
+    initEmpPages:                   0
+    poolPage0:                      0
+    poolflags:   0x              3122
+    objectState: 0x             80027
+    lastSMP:                        0
+  pageSize:                    4096
+  extentSize:                    32
+  bufferPoolID:                   1
+  partialHash:             17039365
+  objDescAttributes:                  0
+  objDescEHLState: 0x00007fb5c37ce9d9
+  bufferPool:    0x00007fb5b2679020
+  pdef:          0x00007fb5b9735d00
+DATA #5 : Bitmask, 4 bytes
+0x00000002
+
+=============
+
+      Table inspection start: DB2INST1.T3
+
+         Data inspection phase start. Data obj: 4  In pool: 5
+         Data inspection phase end.
+
+
+         Index inspection phase start. Index obj: 4  In pool: 5
+         Error: BPS check read error for pool page 202, from object ID 4, pool 5,
+         Error: BPS Header pool relative page number incorrect. Expecting 202, Found 0.
+         Error: BPS Header problems found
+         Error: in page 10, pool page 202, of obj 4, in tablespace 5.
+         Error: Page data will be dumped to report.
+
+           000       *3000 D00F 0A00 0000 0005 012A 0500 0000*   *0...............*
+
+
+
+=============
+https://www.ibm.com/support/pages/how-resolve-index-corruption-db2
+
+db2 reorg indexes all for table DB2INST1.T3
+db2dart CORRUPT1 /MI /TSI 5 /OI 4
+
+/MI
+Marks index as invalid. When specifying this parameter the database must be offline. Requires two input values: table space ID and index object ID. For partitioned indexes, these values can be obtained from INDPARTITIONOBJECTID and INDPARTITIONTBSPACEID for SYSCAT.INDEXPARTITIONS.
+
+-- Check Whole Database: 
+db2dart SAMPLE /DB /RPT . /RPTN SAMPLE.rpt 
+-- Check Single Table:
+db2dart SAMPLE /T /TSI 1 /OI 131 /RPT . /RPTN SAMPLE_p1_o131.rpt
+-- For tablespace Single Table
+db2dart sample /TS /TSI 2 /RPT . /RPTN SAMPLE_TS_2.rpt
