@@ -1,1 +1,1 @@
-# Education.github.io
+# Welcome to Db2 Education Session
