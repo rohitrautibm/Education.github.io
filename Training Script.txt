@@ -1,0 +1,176 @@
+#!/bin/sh
+# insert into table invoice training script  
+# DB2 Table partitioning training - Sanjay
+
+db2 connect to abcd 
+db2 set schema training
+####==========================
+i=0
+# High value Partition data Entry
+####==========================
+
+while [ $i -lt 10 ]
+do
+i=`expr $i + 1`
+#random 4 digit number
+custid=$((1000 + RANDOM % 9999))
+
+#random date minvalue '1999-01-01'   maxdate='9999-01-01'  
+
+mdate=`shuf -n1 -i$(date -d '1999-01-01' '+%s')-$(date -d '9999-01-31' '+%s')| xargs -I{} date -d '@{}' '+%m/%d/%Y'`
+
+#Randoam Decimal amount
+#random 4 digit number with 1 decimal 
+amt=`bc <<< "scale=1; 2 * $RANDOM % 32767"`
+
+echo $custid 
+echo $mdate 
+echo $amt
+
+db2 "insert into invoice values($custid , '$mdate' , $amt)"
+done
+####==========================
+i=0
+# 2023 Entry
+####==========================
+while [ $i -lt 10 ]
+do
+i=`expr $i + 1`
+#random 4 digit number
+custid=$((1000 + RANDOM % 9999))
+
+#random date minvalue '1999-01-01'   maxdate='9999-01-01'  
+
+mdate=`shuf -n1 -i$(date -d '2023-01-01' '+%s')-$(date -d '2023-12-31' '+%s')| xargs -I{} date -d '@{}' '+%m/%d/%Y'`
+
+#Randoam Decimal amount
+#random 4 digit number with 1 decimal 
+amt=`bc <<< "scale=1; 2 * $RANDOM % 32767"`
+
+echo $custid 
+echo $mdate 
+echo $amt
+
+db2 "insert into invoice values($custid , '$mdate' , $amt)"
+done
+####==========================
+i=0
+# Low value Partition Entry
+####==========================
+while [ $i -lt 10 ]
+do
+i=`expr $i + 1`
+#random 4 digit number
+custid=$((1000 + RANDOM % 9999))
+
+#random date minvalue '1999-01-01'   maxdate='9999-01-01'  
+
+mdate=`shuf -n1 -i$(date -d '1999-01-01' '+%s')-$(date -d '2022-12-31' '+%s')| xargs -I{} date -d '@{}' '+%m/%d/%Y'`
+
+#Randoam Decimal amount
+#random 4 digit number with 1 decimal 
+amt=`bc <<< "scale=1; 2 * $RANDOM % 32767"`
+
+echo $custid 
+echo $mdate 
+echo $amt
+
+db2 "insert into invoice values($custid , '$mdate' , $amt)"
+done
+####=========================================================================================================================
+Roll in - Script 2
+####=========================================================================================================================
+
+#!/bin/sh
+# insert into table invoice_tp1 training script  
+# DB2 Table partitioning training - Sanjay
+
+db2 connect to abcd 
+db2 set schema training
+####==========================
+i=0
+# 2023 Entry
+####==========================
+while [ $i -lt 100 ]
+do
+i=`expr $i + 1`
+#random 4 digit number
+custid=$((1000 + RANDOM % 9999))
+
+#random date minvalue '1999-01-01'   maxdate='9999-01-01'  
+
+mdate=`shuf -n1 -i$(date -d '2023-01-01' '+%s')-$(date -d '2023-09-30' '+%s')| xargs -I{} date -d '@{}' '+%m/%d/%Y'`
+
+#Randoam Decimal amount
+#random 4 digit number with 1 decimal 
+amt=`bc <<< "scale=1; 2 * $RANDOM % 32767"`
+
+echo $custid 
+echo $mdate 
+echo $amt
+
+db2 "insert into invoice_tp1 values($custid , '$mdate' , $amt)"
+done
+####==========================
+i=0
+# Low value Partition Entry
+####==========================
+while [ $i -lt 10 ]
+do
+i=`expr $i + 1`
+#random 4 digit number
+custid=$((1000 + RANDOM % 9999))
+
+#random date minvalue '1999-01-01'   maxdate='9999-01-01'  
+
+mdate=`shuf -n1 -i$(date -d '1999-01-01' '+%s')-$(date -d '2022-12-31' '+%s')| xargs -I{} date -d '@{}' '+%m/%d/%Y'`
+
+#Randoam Decimal amount
+#random 4 digit number with 1 decimal 
+amt=`bc <<< "scale=1; 2 * $RANDOM % 32767"`
+
+echo $custid 
+echo $mdate 
+echo $amt
+
+db2 "insert into invoice_tp1 values($custid , '$mdate' , $amt)"
+done
+#=========================================================================================================================
+#--Script 2 A  single partition 
+#--PARTITION INV_04 STARTING  ('10/01/2023')  ENDING ('12/31/2023') in TBSP4,
+
+#=========================================================================================================================
+#!/bin/sh
+# insert into table invoice_new training script  
+# DB2 Table partitioning training - Sanjay
+
+db2 connect to abcd 
+db2 set schema training
+####==========================
+i=0
+# 2023 Entry
+####==========================
+while [ $i -lt 100 ]
+do
+i=`expr $i + 1`
+#random 4 digit number
+custid=$((1000 + RANDOM % 9999))
+
+#random date minvalue '10/01/2023'   maxdate='12/31/2023'  
+
+mdate=`shuf -n1 -i$(date -d '2023-10-01' '+%s')-$(date -d '2023-12-31' '+%s')| xargs -I{} date -d '@{}' '+%m/%d/%Y'`
+
+#Randoam Decimal amount
+#random 4 digit number with 1 decimal 
+amt=`bc <<< "scale=1; 2 * $RANDOM % 32767"`
+
+echo $custid 
+echo $mdate 
+echo $amt
+
+db2 "insert into invoice_tp1 values($custid , '$mdate' , $amt)"
+done
+
+####=========================================================================================================================
+Roll out - Script 3
+####=========================================================================================================================

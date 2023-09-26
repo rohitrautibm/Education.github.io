@@ -1,0 +1,337 @@
+https://www.ibm.com/support/pages/db2-how-find-number-rows-contained-each-data-partition
+https://www.ibm.com/docs/en/db2/11.5?topic=tables-placement-partitions
+
+db2 "drop table ERRORSCHEMA.ERRORTABLE"
+db2 "CALL SYSPROC.ADMIN_DROP_SCHEMA('TRAINING', NULL, 'ERRORSCHEMA', 'ERRORTABLE') "
+db2 create tablespace tbsp0 pagesize 4k
+db2 create tablespace tbsp1 pagesize 4k
+db2 create tablespace tbsp2 pagesize 4k
+db2 create tablespace tbsp3 pagesize 4k
+db2 create tablespace tbsp4 pagesize 4k
+db2 create tablespace tbsp5 pagesize 4k
+db2 create tablespace tbsp6 pagesize 4k
+
+db2 create tablespace large1 pagesize 4k file system caching 
+db2 create tablespace large1 pagesize 4k file system caching 
+db2 create tablespace large2 pagesize 4k file system caching 
+db2 create tablespace large3 pagesize 4k file system caching 
+db2 create tablespace large4 pagesize 4k file system caching 
+db2 create tablespace large5 pagesize 4k file system caching 
+db2 create tablespace large6 pagesize 4k file system caching 
+
+========================
+db2 describe table syscat.datapartitions
+db2 set schema training
+
+Short form
+
+db2 "create table payments (id int , paydate date) in tbsp1 , tbsp2  , tbsp3 partition by range (paydate) (starting '01/01/2023' ending '12/31/2023' every 3 months)"
+
+Long Form
+
+db2 "create table payments1 (id int , paydate date) partition by range (paydate) 
+(partition pay1_23 starting '01/01/2023' in tbsp1,
+partition pay2_23 starting '4/01/2023' in tbsp2,
+partition pay3_23 starting '7/01/2023'  in tbsp3,
+partition pay4_23 starting '10/01/2023' ending '12/31/2023' in tbsp4)"
+
+====================
+
+db2 "CREATE TABLE sales1(
+customer_id BIGINT NOT NULL,
+sale_date DATE NOT NULL ) 
+PARTITION BY RANGE(sale_date NULLS LAST)
+ (
+  STARTING  (MINVALUE)  ENDING ('12/31/2022') ,
+  STARTING  ('01/01/2023')  ENDING  ('3/31/2023') , 
+  STARTING  ('04/01/2023')  ENDING  ('6/30/2023') ,
+  STARTING  ('07/01/2023')  ENDING ('9/30/2023') ,
+  STARTING  ('10/01/2023')  ENDING ('12/31/2023')
+ ) "
+ 
+db2 describe data partitions for table sales1 show detail
+db2 "select seqno Partition, card Total_rows from syscat.datapartitions where tabname='SALES1' group by card,seqno"
+db2 "insert into  sales1 values(1234, '02/02/2023')"
+db2 "insert into  sales1 values(1224,'05/02/2023')"
+db2 "insert into  sales1 values(1244,'08/02/2023')"
+db2 "insert into  sales1 values(1254,'11/02/2023')"
+db2 "insert into  sales1 values(1264,'11/02/2024')"
+db2 "insert into  sales1 values(1294,'11/02/2022')"
+db2 "select seqno Partition, card Total_rows from syscat.datapartitions where tabname='SALES1' group by card,seqno"
+db2 runstats on table sales1 and indexes all
+db2 "select seqno Partition, card Total_rows from syscat.datapartitions where tabname='SALES1' group by card,seqno"
+
+db2 "CREATE TABLE sales3
+ (sale_date DATE, customer INT , desc CLOB(102400))
+ PARTITION BY RANGE(sale_date)
+ (
+  STARTING MINVALUE   IN tbsp1 LONG IN large1,
+  STARTING  ('01/01/2023') IN tbsp2 LONG IN large2,
+  STARTING  ('04/01/2023') IN tbsp3 LONG IN large3,
+  STARTING  ('07/01/2023') IN tbsp4 LONG IN large4,
+  STARTING  ('10/01/2023')
+   ENDING ('12/31/2023') IN tbsp5 LONG IN large5)"
+   
+ db2 describe data partitions for table sales3
+ db2 describe data partitions for table sales3 show detail  
+
+====================
+
+db2 "CREATE TABLE sales4(sale_date DATE , customer_id INT ) 
+in tbsp1 , tbsp2 , tbsp3 , tbsp4
+LONG IN large1, large2, large3, large4 
+PARTITION BY RANGE(sale_date)
+ (
+ STARTING  ('01/01/2022') ENDING ('12/31/2023') EVERY 3 MONTHS
+ )"
+ 
+db2 " CREATE TABLE sales6(sale_date DATE, customer BIGINT)
+ IN tbsp1, tbsp2 LONG IN large1, large2
+ PARTITION BY RANGE(sale_date) 
+ (
+  STARTING MINVALUE   IN tbsp0 LONG IN large0,
+  STARTING ('01/01/2023') ,
+  STARTING ('04/01/2023') ,
+  STARTING ('07/01/2023') ,
+  STARTING ('10/01/2023') ENDING ('12/31/2023') IN tbsp5 LONG IN large5
+)"
+
+    
+====================    
+ db2 "CREATE TABLE sales7(
+customer_id BIGINT NOT NULL,
+sale_date DATE NOT NULL ) 
+PARTITION BY RANGE(sale_date NULLS LAST)
+ (
+  STARTING  (MINVALUE)  ENDING ('12/31/2022') ,
+  STARTING  ('01/01/2023')  ENDING  ('3/31/2023') , 
+  STARTING  ('04/01/2023')  ENDING  ('6/30/2023') ,
+  STARTING  ('07/01/2023')  ENDING ('9/30/2023') ,
+  STARTING  ('10/01/2023')  ENDING ('12/31/2023') ,
+  STARTING  ('1/1/2024')    ENDING (MAXVALUE)   
+ ) "
+  
+db2 "insert into  sales7 values(1264,'11/02/2024')"
+
+db2 "CREATE TABLE t1(c1 INT)
+IN tbsp1, tbsp2, tbsp3
+PARTITION BY RANGE(c1)(STARTING FROM (1) ENDING (99) EVERY (33)) "
+
+db2 "CREATE TABLE t1a(c1 INT)
+PARTITION BY RANGE(c1)
+(STARTING FROM (1) ENDING(33) IN tbsp1, ENDING(66) IN tbsp2, ENDING(99) IN tbsp3)"
+
+
+
+====================================================================================================
+Partition Table Example 
+====================================================================================================
+db2 "CREATE TABLE invoice (
+custno INT  NOT NULL ,
+transaction_date DATE  NOT NULL ,
+amount DECIMAL (15, 2)  NOT NULL 
+) "
+
+sh invoice.sh
+
+
+db2 "select count(*) from invoice"
+db2 describe table invoice
+db2look -d abcd -z training -t invoice -e
+
+
+##db2 "CREATE TABLE TRAINING.INVOICE LIKE TRAINING.INVOICE_TP"
+##db2 "INSERT INTO TRAINING.INVOICE_TP (SELECT * FROM TRAINING.INVOICE)"
+
+------------------------------------------------------
+Creat Partition Table for Invoice   
+------------------------------------------------------
+db2 list tables for schema training
+db2 drop table invoice_tp
+db2 "CREATE TABLE invoice_tp (
+custno BIGINT  NOT NULL ,
+transaction_date DATE  NOT NULL ,
+amount DECIMAL (15, 2)  NOT NULL) 
+PARTITION BY RANGE (TRANSACTION_DATE )
+(
+ PARTITION INV_MIN STARTING  (MINVALUE)  ENDING ('12/31/2022') in TBSP0 ,
+ PARTITION INV_01 STARTING  ('01/01/2023')  ENDING  ('3/31/2023') in TBSP1  , 
+ PARTITION INV_02 STARTING  ('04/01/2023')  ENDING  ('6/30/2023') in TBSP2 ,
+ PARTITION INV_03 STARTING  ('07/01/2023')  ENDING ('9/30/2023') in TBSP3 ,
+ PARTITION INV_04 STARTING  ('10/01/2023')  ENDING ('12/31/2023') in TBSP4,
+ PARTITION INV_MAX STARTING  ('1/1/2024')    ENDING (MAXVALUE)  in TBSP5
+) "
+
+db2 describe table invoice
+
+db2 describe data partitions for table invoice_tp
+db2 describe data partitions for table invoice_tp show detail
+
+db2look -d abcd -z training -t invoice_tp -e
+
+
+------------------------------------------------------
+Loading data from non partition table to partition table  
+------------------------------------------------------
+
+   db2 "SELECT count(*) FROM training.invoice"
+   db2 "DECLARE c1 CURSOR FOR SELECT * FROM training.invoice"
+   db2 "LOAD FROM c1 of CURSOR INSERT INTO training.invoice_tp nonrecoverable"
+   ##db2 backup db abcd online to /dev/null
+   db2 "SELECT * FROM invoice_tp"
+
+
+------------------------------------
+Row count per data partition
+------------------------------------
+db2 "select seqno Partition, card Total_rows from syscat.datapartitions where tabname='INVOICE_TP' group by card,seqno"
+db2 runstats on table training.invoice_tp and indexes all
+##db2 "SELECT DATAPARTITIONNUM(TRANSACTION_DATE)Partition, COUNT(*)Total_Rows FROM INVOICE_TP group by DATAPARTITIONNUM(TRANSACTION_DATE) order by DATAPARTITIONNUM(TRANSACTION_DATE)"
+db2 "select seqno Partition, card Total_rows from syscat.datapartitions where tabname='INVOICE_TP' group by card,seqno"
+
+
+------------------------------------
+High / Low Value  DB Partition as define
+------------------------------------
+
+db2 "SELECT SUBSTR(tabname, 1,16) tabname, \
+SUBSTR(datapartitionname, 1, 12) datapartitionname, \
+seqno, SUBSTR(lowvalue, 1, 12) as lowvalue, LOWINCLUSIVE, \
+SUBSTR(highvalue, 1, 12) as highvalue,HIGHINCLUSIVE \
+FROM SYSCAT.DATAPARTITIONS WHERE TABNAME='INVOICE_TP' ORDER BY seqno" 
+
+db2 "select
+  substr(d.tabname,1,7) tabname, substr(t.tbspace,1,7) tbspace,
+  substr(d.lowvalue,1,12) lowvalue, d.lowinclusive lo_inc,
+  substr(d.highvalue,1,12) highvalue, d.highinclusive hi_inc
+    from syscat.datapartitions d, syscat.tablespaces t
+      where d.tbspaceid=t.tbspaceid and d.tbspaceid<>0 and
+        d.tabname='INVOICE_TP'
+          order by tabname, seqno"
+
+
+------------------------------------
+Min / MAX value per data partition 
+------------------------------------
+MIN
+db2 "select DATAPARTITIONNUM(TRANSACTION_DATE)Partition, min(transaction_date) from invoice_tp group by DATAPARTITIONNUM(TRANSACTION_DATE) "
+
+MAX
+db2 "select DATAPARTITIONNUM(TRANSACTION_DATE)Partition, max(transaction_date) from invoice_tp group by DATAPARTITIONNUM(TRANSACTION_DATE) "
+------------------------------------
+Data per data partition 
+------------------------------------
+
+db2 "select DATAPARTITIONNUM(TRANSACTION_DATE)Partition, * from invoice_tp  order by DATAPARTITIONNUM(TRANSACTION_DATE) "
+db2 "select DATAPARTITIONNUM(TRANSACTION_DATE)Partition, * from invoice_tp where DATAPARTITIONNUM(TRANSACTION_DATE)=0   order by DATAPARTITIONNUM(TRANSACTION_DATE) "
+
+------------------------------------
+Misc 
+------------------------------------
+
+db2 "SELECT DATAPARTITIONNAME FROM SYSCAT.DATAPARTITIONS WHERE TABNAME = 'INVOICE_TP' "
+db2 " SELECT DEPTABSCHEMA, DEPTABNAME FROM SYSCAT.TABDETACHEDDEP WHERE TABSCHEMA='TRAINING' and TABNAME='INVOICE_TP'"
+
+db2 list tablespaces show detail|grep -i state
+
+====================================================================================================
+******** Table Partition Roll in *****************
+====================================================================================================
+
+db2 "CREATE TABLE invoice_tp1 (
+custno BIGINT  NOT NULL ,
+transaction_date DATE  NOT NULL ,
+amount DECIMAL (15, 2)  NOT NULL) 
+PARTITION BY RANGE (TRANSACTION_DATE )
+(
+ PARTITION INV_MIN STARTING  (MINVALUE)  ENDING ('12/31/2022') in TBSP0 ,
+ PARTITION INV_01 STARTING  ('01/01/2023')  ENDING  ('3/31/2023') in TBSP1  , 
+ PARTITION INV_02 STARTING  ('04/01/2023')  ENDING  ('6/30/2023') in TBSP2 ,
+ PARTITION INV_03 STARTING  ('07/01/2023')  ENDING ('9/30/2023') in TBSP3 
+ ) "
+
+db2 describe data partitions for table invoice_tp1
+db2 describe data partitions for table invoice_tp1 show detail
+db2look -d abcd -z training -t invoice_tp1 -e
+
+db2 runstats on table training.invoice_tp1 and indexes all
+db2 "SELECT DATAPARTITIONNUM(TRANSACTION_DATE)Partition, COUNT(*)Total_Rows FROM INVOICE_TP1 group by DATAPARTITIONNUM(TRANSACTION_DATE) order by DATAPARTITIONNUM(TRANSACTION_DATE)"
+db2 "select seqno Partition, card Total_rows from syscat.datapartitions where tabname='INVOICE_TP1' group by card,seqno"
+
+
+
+db2 "CREATE TABLE invoice_new (
+custno BIGINT  NOT NULL ,
+transaction_date DATE  NOT NULL ,
+amount DECIMAL (15, 2)  NOT NULL) in tbsp4"
+
+db2 describe table invoice_new
+ 
+db2 runstats on table training.invoice_new and indexes all
+db2 "select count(*) from training.invoice_new"
+ 
+------------------------------------------------------------
+Roll in  ('10/01/2023')  ENDING ('12/31/2023') in TBSP4,
+------------------------------------------------------------
+db2 "ALTER TABLE invoice_tp1 ATTACH PARTITION INV_04 STARTING FROM ('10/1/2023') ENDING AT ('12/31/2023')  FROM invoice_new"
+
+db2 SET INTEGRITY FOR invoice_tp1 ALLOW WRITE ACCESS IMMEDIATE CHECKED 
+
+db2 describe data partitions for table invoice_tp1
+db2 describe data partitions for table invoice_tp1 show detail
+db2look -d abcd -z training -t invoice_tp1 -e
+
+db2 runstats on table training.invoice_tp1 and indexes all
+db2 "SELECT DATAPARTITIONNUM(TRANSACTION_DATE)Partition, COUNT(*)Total_Rows FROM INVOICE_TP1 group by DATAPARTITIONNUM(TRANSACTION_DATE) order by DATAPARTITIONNUM(TRANSACTION_DATE)"
+db2 "select seqno Partition, card Total_rows from syscat.datapartitions where tabname='INVOICE_TP1' group by card,seqno"
+
+------------------------------------
+Min / MAX value per data partition 
+------------------------------------
+MIN
+db2 "select DATAPARTITIONNUM(TRANSACTION_DATE)Partition, min(transaction_date) from invoice_tp group by DATAPARTITIONNUM(TRANSACTION_DATE) "
+
+MAX
+db2 "select DATAPARTITIONNUM(TRANSACTION_DATE)Partition, max(transaction_date) from invoice_tp group by DATAPARTITIONNUM(TRANSACTION_DATE) "
+------------------------------------
+Data per data partition 
+------------------------------------
+
+db2 "select DATAPARTITIONNUM(TRANSACTION_DATE)Partition, * from invoice_tp  order by DATAPARTITIONNUM(TRANSACTION_DATE) "
+db2 "select DATAPARTITIONNUM(TRANSACTION_DATE)Partition, * from invoice_tp where DATAPARTITIONNUM(TRANSACTION_DATE)=0   order by DATAPARTITIONNUM(TRANSACTION_DATE) "
+
+------------------------------------
+
+====================================================================================================
+====================================================================================================
+******** Table Partition Roll out *****************
+====================================================================================================
+
+db2 describe data partitions for table invoice_tp1
+db2 describe data partitions for table invoice_tp1 show detail
+
+------------------------------------------------------------
+Roll out  ('1/1/2023')  ENDING ('3/31/2023') in TBSP4,
+------------------------------------------------------------
+db2 "ALTER TABLE invoice_tp1 DETACH PARTITION INV_02 into invoice_Q123"
+
+db2 list tables for all|grep -i invoice_Q123
+
+db2look -d abcd -z training -t invoice_Q123 -e
+
+
+db2 "ALTER TABLE invoice_tp1 ATTACH PARTITION INV_02 STARTING FROM ('1/1/2023') ENDING AT ('3/31/2023') IN TBSP1 FROM invoice_Q123"
+
+
+====================================================================================================
+====================================================================================================
+******** Table Partition - Add  *****************
+====================================================================================================
+
+db2 "alter table invoice_tp1 add partition INV_06 STARTING FROM ('1/1/2024') ENDING AT ('3/31/2024') IN TBSP1"
+
+db2look -d abcd -z training -t invoice_tp -e
+
+ 
+  
+
