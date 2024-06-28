@@ -1,0 +1,183 @@
+-- Inportant links
+
+WLM functionality is included in all Db2 Edition
+https://www.ibm.com/docs/en/db2/11.5?topic=editions-functionality-in-db2-product-db2-offerings
+
+Db2 workload management
+https://www.ibm.com/docs/en/db2/11.5?topic=administration-db2-workload-management
+All these operations are using the same database system and competing for the same resources.
+
+Activities
+https://www.ibm.com/docs/en/db2/11.5?topic=identification-activities
+During its life cycle, an activity can spend time in various states, 
+which are reported by the activity_state event monitor element. 
+Some of the states an activity can be in are:
+EXECUTING - This state indicates that the coordinator agent is working on the activity. An activity that encounters a lock wait situation is reported as executing. The total amount of time spent executing activities is returned by the total_act_time monitor element.
+IDLE - This state indicates that the coordinator agent is waiting for the next request from a client.
+QUEUED - Some thresholds include a built-in queue. This state indicates that the activity is waiting in the queue for its turn to begin executing.
+
+Domains of workload management
+https://www.ibm.com/docs/en/db2/11.5?topic=management-domains-workload
+Identification
+If you want to achieve a goal for some kind of work, you first must be able to identify details about the work. 
+For the data server, you need to decide how you want to identify the work that enters the system. You can use the name of the application that submits the work, the authorization ID that submits the work, or a combination of elements that provide some form of identification.
+
+Management
+The management phase includes mechanisms for making steady progress towards your goal, and actions to take if a goal is not being met.
+On the data server, you might find that overall performance is suffering when a few poorly written SQL statements are running, a surge in volume occurs during peak times, or there is too much competition between different applications for the same resources. The management phase includes mechanisms for assigning resources to achieve your goals and actions to take if a goal is not being met. 
+
+Monitoring
+Monitoring is important for a couple of reasons. First, to determine whether you are achieving a goal, you must have a mechanism to track progress toward that goal.
+For a data server, there are often explicit goals for response times of database activities and it is important to have a way to measure this metric, and watch for trends.
+
+Workload management DDL statements
+https://www.ibm.com/docs/en/db2/11.5?topic=identification-workload-management-ddl-statements
+
+
+-- Example:1 Using default threshold
+Create a new database called newdb
+db2 connect to newdb
+
+db2look -d newdb -wlm -o newdb_wlm
+
+ALTER THRESHOLD "SYSDEFAULTCONCURRENT"
+DISABLE
+WHEN CONCURRENTDBCOORDACTIVITIES > 11 AND QUEUEDACTIVITIES UNBOUNDED
+STOP EXECUTION;
+db2 "ALTER THRESHOLD "SYSDEFAULTCONCURRENT" WHEN CONCURRENTDBCOORDACTIVITIES > 11 AND QUEUEDACTIVITIES UNBOUNDED STOP EXECUTION"
+
+-- Altering THRESHOLD "SYSDEFAULTCONCURRENT"
+
+db2 "ALTER THRESHOLD "SYSDEFAULTCONCURRENT" WHEN CONCURRENTDBCOORDACTIVITIES > 2 AND QUEUEDACTIVITIES UNBOUNDED STOP EXECUTION"
+
+db2 ALTER THRESHOLD  SYSDEFAULTCONCURRENT ENABLE
+db2 ALTER THRESHOLD  SYSDEFAULTCONCURRENT DISABLE
+
+db2 GRANT USAGE ON WORKLOAD SYSDEFAULTUSERWORKLOAD TO PUBLIC
+
+db2 "select * from SYSCAT.THRESHOLDS"
+THRESHOLDNAME                                                                                                                    THRESHOLDID ORIGIN THRESHOLDCLASS THRESHOLDPREDICATE THRESHOLDPREDICATEID DOMAIN DOMAINID    ENFORCEMENT QUEUING MAXVALUE             DATATAGLIST                                                                                                                                                                                                                                                      QUEUESIZE   OVERFLOWPERCENT COLLECTACTDATA COLLECTACTPARTITION EXECUTION REMAPSCID VIOLATIONRECORDLOGGED CHECKINTERVAL ENABLED CREATE_TIME                ALTER_TIME                 REMARKS                                                                                                                                                                                                                                             
+-------------------------------------------------------------------------------------------------------------------------------- ----------- ------ -------------- ------------------ -------------------- ------ ----------- ----------- ------- -------------------- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- ----------- --------------- -------------- ------------------- --------- --------- --------------------- ------------- ------- -------------------------- -------------------------- --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SYSDEFAULTCONCURRENT                                                                                                              2147483647 U      A              CONCDBC                              90 SB               4 D           Y                          2 -                                                                                                                                                                                                                                                                         -1              -1 N              C                   S                 0 Y                                 0 Y       2024-03-26-01.53.31.124665 2024-03-26-09.23.44.964269 -                                                                                                                                                                                                                                                   
+
+db2 "select THRESHOLDNAME,ENFORCEMENT,QUEUING, MAXVALUE,ENABLED from SYSCAT.THRESHOLDS"
+
+  1 record(s) selected.
+
+db2 "select * from SYSCAT.WORKLOADS"
+WORKLOADID  WORKLOADNAME                                                                                                                     EVALUATIONORDER CREATE_TIME                ALTER_TIME                 ENABLED ALLOWACCESS MAXDEGREE SERVICECLASSNAME                                                                                                                 PARENTSERVICECLASSNAME                                                                                                           COLLECTAGGACTDATA COLLECTACTDATA COLLECTACTPARTITION COLLECTDEADLOCK COLLECTLOCKTIMEOUT COLLECTLOCKWAIT LOCKWAITVALUE COLLECTACTMETRICS COLLECTUOWDATAOPTIONS            COLLECTUOWDATA EXTERNALNAME                                                                                                                     SECTIONACTUALSOPTIONS            COLLECTAGGUOWDATA PRIORITY REMARKS                                                                  
+----------- -------------------------------------------------------------------------------------------------------------------------------- --------------- -------------------------- -------------------------- ------- ----------- --------- -------------------------------------------------------------------------------------------------------------------------------- -------------------------------------------------------------------------------------------------------------------------------- ----------------- -------------- ------------------- --------------- ------------------ --------------- ------------- ----------------- -------------------------------- -------------- -------------------------------------------------------------------------------------------------------------------------------- -------------------------------- ----------------- -------- --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+          1 SYSDEFAULTUSERWORKLOAD                                                                                                                         1 2024-03-26-01.53.31.064016 2024-03-26-01.53.31.064016 Y       Y                  -1 SYSDEFAULTSUBCLASS                                                                                                               SYSDEFAULTUSERCLASS                                                                                                              N                 N              C                   W               W                  N                           0 N                 NNN                              N              -                                                                                                                                NN                               N                 MEDIUM   -                                                                        
+          2 SYSDEFAULTADMWORKLOAD                                                                                                                          2 2024-03-26-01.53.31.085347 2024-03-26-01.53.31.085347 Y       Y                  -1 SYSDEFAULTSUBCLASS                                                                                                               SYSDEFAULTUSERCLASS                                                                                                              N                 N              C                   W               W                  N                           0 N                 NNN                              N              -                                                                                                                                NN                               N                 MEDIUM   -                                                                        
+
+  2 record(s) selected.
+
+-- Displaying resource usage information for executing or queued queries
+https://www.ibm.com/docs/en/db2/11.5?topic=queued-displaying-resource-usage-information-executing-queries
+db2 "WITH TOTAL_MEM(CFG_MEM, MEMBER) AS (SELECT VALUE, MEMBER FROM SYSIBMADM.DBCFG WHERE NAME = 'sheapthres_shr'), LOADTRGT(LOADTRGT) AS (SELECT MAX(VALUE) FROM SYSIBMADM.DBCFG WHERE NAME = 'wlm_agent_load_trgt'), CPUINFO(CPUS_PER_HOST) AS (SELECT MAX(CPU_ONLINE / CPU_HMT_DEGREE) FROM TABLE(ENV_GET_SYSTEM_RESOURCES())), PARTINFO(PART_PER_HOST) AS (SELECT COUNT(*) PART_PER_HOST FROM TABLE(DB_MEMBERS()) AS T WHERE T.MEMBER_TYPE = 'D' GROUP BY HOST_NAME FETCH FIRST 1 ROWS ONLY ) SELECT A.MEMBER, A.COORD_MEMBER, A.ACTIVITY_STATE, A.APPLICATION_HANDLE, A.UOW_ID, A.ACTIVITY_ID, substr(B.APPLICATION_NAME,1,10) APPLICATION_NAME, substr(B.SESSION_AUTH_ID,1,8) SESSION_AUTH_ID, substr(B.CLIENT_IPADDR,1,15) CLIENT_IPADDR, A.ENTRY_TIME, A.LOCAL_START_TIME, CASE WHEN (A.LOCAL_START_TIME IS NOT NULL) THEN TIMESTAMPDIFF(2, CHAR(A.LOCAL_START_TIME - A.ENTRY_TIME)) ELSE A.WLM_QUEUE_TIME_TOTAL/1000 END AS TOTAL_QUEUETIME_SECONDS, CASE WHEN (A.LOCAL_START_TIME IS NOT NULL) THEN TIMESTAMPDIFF(2, CHAR(CURRENT_TIMESTAMP-A.LOCAL_START_TIME)) ELSE NULL END AS TOTAL_RUNTIME_SECONDS, CASE WHEN (A.LOCAL_START_TIME IS NOT NULL) THEN TIMESTAMPDIFF(2, CHAR(CURRENT_TIMESTAMP-A.LOCAL_START_TIME))-A.COORD_STMT_EXEC_TIME/1000 ELSE NULL END AS TOTAL_CLIENT_WAIT_SECONDS, A.ADM_BYPASSED, A.ADM_RESOURCE_ACTUALS, A.EFFECTIVE_QUERY_DEGREE, DEC((FLOAT(A.EFFECTIVE_QUERY_DEGREE)/(FLOAT(D.LOADTRGT) * FLOAT(E.CPUS_PER_HOST) / FLOAT(F.PART_PER_HOST)))*100,5,2) AS THREADS_USED_PCT, A.QUERY_COST_ESTIMATE, A.ESTIMATED_RUNTIME, A.ESTIMATED_SORT_SHRHEAP_TOP AS ESTIMATED_SORTMEM_USED_PAGES, DEC((FLOAT(A.ESTIMATED_SORT_SHRHEAP_TOP)/FLOAT(C.CFG_MEM)) * 100, 5, 2) AS ESTIMATED_SORTMEM_USED_PCT, A.SORT_SHRHEAP_ALLOCATED AS SORTMEM_USED_PAGES, DEC((FLOAT(A.SORT_SHRHEAP_ALLOCATED)/FLOAT(C.CFG_MEM)) * 100, 5, 2) AS SORTMEM_USED_PCT, SORT_SHRHEAP_TOP AS PEAK_SORTMEM_USED_PAGES, DEC((FLOAT(A.SORT_SHRHEAP_TOP)/FLOAT(C.CFG_MEM)) * 100, 5, 2) AS PEAK_SORTMEM_USED_PCT, substr(C.CFG_MEM,1,10) AS CONFIGURED_SORTMEM_PAGES, SUBSTR(A.STMT_TEXT, 1, 512) AS STMT_TEXT FROM TABLE(MON_GET_ACTIVITY(NULL,-2)) AS A, TABLE(MON_GET_CONNECTION(NULL,-1)) AS B, TOTAL_MEM AS C, LOADTRGT AS D, CPUINFO AS E, PARTINFO AS F WHERE (A.APPLICATION_HANDLE = B.APPLICATION_HANDLE) AND (A.MEMBER = C.MEMBER) ORDER BY MEMBER, APPLICATION_HANDLE, UOW_ID, ACTIVITY_ID, ACTIVITY_STATE"
+
+-- A sample select which runs for longer time
+db2 "select count_big(*) from WLMTEST.VASTRDE2"
+
+-- Example: Determining which activities are queued by a WLM threshold and their queue order
+https://www.ibm.com/docs/en/db2/11.5?topic=rtmtf-example-determining-which-activities-are-queued-by-wlm-threshold-their-queue-order
+CREATE VIEW WLM_QUEUE_INFO (APPLICATION_HANDLE, UOW_ID, ACTIVITY_ID, 
+    THRESHOLD_NAME, QUEUE_ENTRY_TIME, MEMBER) 
+    AS SELECT APPLICATION_HANDLE, UOW_ID, ACTIVITY_ID, 
+    VARCHAR(EVENT_OBJECT_NAME, 128), AGENT_STATE_LAST_UPDATE_TIME, 
+    MEMBER FROM TABLE(WLM_GET_SERVICE_CLASS_AGENTS(NULL,NULL,NULL,-2)) 
+    AS T WHERE EVENT_OBJECT = 'WLM_QUEUE'
+db2 "SELECT VARCHAR(THRESHOLD_NAME, 30) AS THRESHOLD, COUNT(*) AS QUEUED_ENTRIES FROM WLM_QUEUE_INFO GROUP BY THRESHOLD_NAME"
+
+
+
+
+-- Example:2 Imposing threshold for a user 
+
+=========
+-- Cleanup commands
+db2 alter threshold MY_ESTIMATEDSQLCOST disable
+db2 drop threshold MY_ESTIMATEDSQLCOST
+
+db2 ALTER WORKLOAD MY_WORK DISABLE
+db2 drop workload MY_WORK
+
+db2 alter SERVICE CLASS MY_CLASS disable
+db2 drop SERVICE CLASS MY_CLASS
+=========
+
+db2 connect to sample
+-- A sample select which runs for longer time
+db2 "select count_big(*) from WLMTEST.VASTRDE2"
+
+db2 "select count(*) from WLMTEST.department"
+
+-- Sample o/p. Select showing high QUERY_COST_ESTIMATE
+db2 "WITH TOTAL_MEM(CFG_MEM, MEMBER) AS (SELECT VALUE, MEMBER FROM SYSIBMADM.DBCFG WHERE NAME = 'sheapthres_shr'), LOADTRGT(LOADTRGT) AS (SELECT MAX(VALUE) FROM SYSIBMADM.DBCFG WHERE NAME = 'wlm_agent_load_trgt'), CPUINFO(CPUS_PER_HOST) AS (SELECT MAX(CPU_ONLINE / CPU_HMT_DEGREE) FROM TABLE(ENV_GET_SYSTEM_RESOURCES())), PARTINFO(PART_PER_HOST) AS (SELECT COUNT(*) PART_PER_HOST FROM TABLE(DB_MEMBERS()) AS T WHERE T.MEMBER_TYPE = 'D' GROUP BY HOST_NAME FETCH FIRST 1 ROWS ONLY ) SELECT A.MEMBER, A.COORD_MEMBER, A.ACTIVITY_STATE, A.APPLICATION_HANDLE, A.UOW_ID, A.ACTIVITY_ID, substr(B.APPLICATION_NAME,1,10) APPLICATION_NAME, substr(B.SESSION_AUTH_ID,1,8) SESSION_AUTH_ID, substr(B.CLIENT_IPADDR,1,15) CLIENT_IPADDR, A.ENTRY_TIME, A.LOCAL_START_TIME, CASE WHEN (A.LOCAL_START_TIME IS NOT NULL) THEN TIMESTAMPDIFF(2, CHAR(A.LOCAL_START_TIME - A.ENTRY_TIME)) ELSE A.WLM_QUEUE_TIME_TOTAL/1000 END AS TOTAL_QUEUETIME_SECONDS, CASE WHEN (A.LOCAL_START_TIME IS NOT NULL) THEN TIMESTAMPDIFF(2, CHAR(CURRENT_TIMESTAMP-A.LOCAL_START_TIME)) ELSE NULL END AS TOTAL_RUNTIME_SECONDS, CASE WHEN (A.LOCAL_START_TIME IS NOT NULL) THEN TIMESTAMPDIFF(2, CHAR(CURRENT_TIMESTAMP-A.LOCAL_START_TIME))-A.COORD_STMT_EXEC_TIME/1000 ELSE NULL END AS TOTAL_CLIENT_WAIT_SECONDS, A.ADM_BYPASSED, A.ADM_RESOURCE_ACTUALS, A.EFFECTIVE_QUERY_DEGREE, DEC((FLOAT(A.EFFECTIVE_QUERY_DEGREE)/(FLOAT(D.LOADTRGT) * FLOAT(E.CPUS_PER_HOST) / FLOAT(F.PART_PER_HOST)))*100,5,2) AS THREADS_USED_PCT, A.QUERY_COST_ESTIMATE, A.ESTIMATED_RUNTIME, A.ESTIMATED_SORT_SHRHEAP_TOP AS ESTIMATED_SORTMEM_USED_PAGES, DEC((FLOAT(A.ESTIMATED_SORT_SHRHEAP_TOP)/FLOAT(C.CFG_MEM)) * 100, 5, 2) AS ESTIMATED_SORTMEM_USED_PCT, A.SORT_SHRHEAP_ALLOCATED AS SORTMEM_USED_PAGES, DEC((FLOAT(A.SORT_SHRHEAP_ALLOCATED)/FLOAT(C.CFG_MEM)) * 100, 5, 2) AS SORTMEM_USED_PCT, SORT_SHRHEAP_TOP AS PEAK_SORTMEM_USED_PAGES, DEC((FLOAT(A.SORT_SHRHEAP_TOP)/FLOAT(C.CFG_MEM)) * 100, 5, 2) AS PEAK_SORTMEM_USED_PCT, substr(C.CFG_MEM,1,10) AS CONFIGURED_SORTMEM_PAGES, SUBSTR(A.STMT_TEXT, 1, 512) AS STMT_TEXT FROM TABLE(MON_GET_ACTIVITY(NULL,-2)) AS A, TABLE(MON_GET_CONNECTION(NULL,-1)) AS B, TOTAL_MEM AS C, LOADTRGT AS D, CPUINFO AS E, PARTINFO AS F WHERE (A.APPLICATION_HANDLE = B.APPLICATION_HANDLE) AND (A.MEMBER = C.MEMBER) ORDER BY MEMBER, APPLICATION_HANDLE, UOW_ID, ACTIVITY_ID, ACTIVITY_STATE"
+MEMBER COORD_MEMBER ACTIVITY_STATE                   APPLICATION_HANDLE   UOW_ID      ACTIVITY_ID APPLICATION_NAME SESSION_AUTH_ID CLIENT_IPADDR   ENTRY_TIME                 LOCAL_START_TIME           TOTAL_QUEUETIME_SECONDS TOTAL_RUNTIME_SECONDS TOTAL_CLIENT_WAIT_SECONDS ADM_BYPASSED ADM_RESOURCE_ACTUALS EFFECTIVE_QUERY_DEGREE THREADS_USED_PCT QUERY_COST_ESTIMATE  ESTIMATED_RUNTIME    ESTIMATED_SORTMEM_USED_PAGES ESTIMATED_SORTMEM_USED_PCT SORTMEM_USED_PAGES   SORTMEM_USED_PCT PEAK_SORTMEM_USED_PAGES PEAK_SORTMEM_USED_PCT CONFIGURED_SORTMEM_PAGES STMT_TEXT                                                                                                                                                                                                                                                                                                                                                                                                 
+------ ------------ -------------------------------- -------------------- ----------- ----------- ---------------- --------------- --------------- -------------------------- -------------------------- ----------------------- --------------------- ------------------------- ------------ -------------------- ---------------------- ---------------- -------------------- -------------------- ---------------------------- -------------------------- -------------------- ---------------- ----------------------- --------------------- ------------------------ --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+     0            0 EXECUTING                                         335           2           1 db2bp            DB2INST1        -               2024-04-05-04.22.33.472429 2024-04-05-04.22.33.472448                       0                   180                         4            0 N                                         1             1.78               318398            325707939                          276                       5.52                  146             2.92                     276                  5.52 5000                     select count_big(*) from WLMTEST.VASTRDE2                                                                                                                                                                                                                                                                                                                                                                 
+
+-- Creating a new class
+db2 "CREATE SERVICE CLASS MY_CLASS"
+A service class defines an execution environment in which work can run. 
+
+db2 "select * from SYSCAT.SERVICECLASSES"
+
+-- Creating a workload
+db2 "CREATE WORKLOAD MY_WORK session_user ('MILIND') SERVICE CLASS MY_CLASS"
+db2 "CREATE WORKLOAD MY_WORK address ('9.199.232.254') SERVICE CLASS MY_CLASS"
+The service class where work submitted by occurrences of this workload is to be executed.
+
+db2 "select * from SYSCAT.WORKLOADS"
+
+See Step 3: Grant usage on workload in below link.
+db2 GRANT USAGE ON WORKLOAD MY_WORK TO PUBLIC
+https://www.ibm.com/docs/en/db2/11.5?topic=tdwm-exercise-2-isolating-activities-using-service-classes-workloads
+Additional information: A connection can be associated with a workload only if the session user has USAGE privilege on the workload.
+
+-- Creating threshold to stop high QUERY_COST_ESTIMATE queries
+db2 drop threshold MY_ESTIMATEDSQLCOST
+db2 "CREATE THRESHOLD MY_ESTIMATEDSQLCOST FOR SERVICE CLASS MY_CLASS ACTIVITIES ENFORCEMENT DATABASE WHEN ESTIMATEDSQLCOST  > 300000 STOP EXECUTION"
+
+db2 "select * from SYSCAT.THRESHOLDS"
+
+C:\milind\WLM>db2 "select count_big(*) from WLMTEST.VASTRDE2"
+SQL4712N  The activity or request was stopped because the threshold
+"MY_ESTIMATEDSQLCOST" has been exceeded. Reason code: "7".  SQLSTATE=5U026
+
+db2 "CREATE EVENT MONITOR DBTHRESHOLDVIOLATIONS FOR THRESHOLD VIOLATIONS WRITE TO TABLE THRESHOLDVIOLATIONS (TABLE THRESHOLDVIOLATIONS_DBTHRESHOLDVIOLATIONS IN USERSPACE1 PCTDEACTIVATE 100), CONTROL (TABLE CONTROL_DBTHRESHOLDVIOLATIONS IN USERSPACE1 PCTDEACTIVATE 100) AUTOSTART"
+db2 set event monitor DBTHRESHOLDVIOLATIONS state=1
+
+db2 "select * from THRESHOLDVIOLATIONS_DBTHRESHOLDVIOLATIONS"
+
+=========
+
+Some other examples to self try.
+
+Example: Using work action sets to determine the types of work being run
+https://www.ibm.com/docs/en/db2/11.5?topic=actawas-example-using-work-action-sets-determine-types-work-being-run
+
+SELECT SUBSTR(CHAR(MEMBER),1,4) AS MEMB,
+LAST_RESET,
+SUBSTR(WORK_CLASS_NAME,1,15) AS WORK_CLASS_NAME,
+SUBSTR(CHAR(ACT_TOTAL),1,14) AS TOTAL_ACTS
+FROM TABLE(WLM_GET_WORK_ACTION_SET_STATS(CAST(NULL AS VARCHAR(128)), -2))
+AS WASSTATS WHERE WORK_ACTION_SET_NAME = 'COUNTACTIONS'
+ORDER BY WORK_CLASS_NAME, MEMB;
+
+-- Exercise 7: Cancelling an ongoing activity
+https://www.ibm.com/docs/en/db2/11.5?topic=management-exercise-7-cancelling-ongoing-activity
+
+db2 "SELECT T.APPLICATION_HANDLE, T.UOW_ID, T.ACTIVITY_ID, T.ACTIVITY_TYPE, T.CLIENT_APPLNAME,T.APPLICATION_NAME FROM  TABLE(WLM_GET_WORKLOAD_OCCURRENCE_ACTIVITIES (CAST(NULL AS BIGINT), -2)) T"
+     
+SELECT T.APPLICATION_HANDLE, T.UOW_ID, T.ACTIVITY_ID, T.ACTIVITY_TYPE, T.CLIENT_APPLNAME
+FROM  TABLE(WLM_GET_WORKLOAD_OCCURRENCE_ACTIVITIES
+              (CAST(NULL AS BIGINT), -2)) T
+      WHERE T.APPLICATION_NAME = 'db2bp';
+
+db2 "CALL WLM_CANCEL_ACTIVITY (1731, 1, 1)"
+
+-- Tutorial for Db2 workload management
+https://www.ibm.com/docs/en/db2/11.5?topic=management-tutorial-db2-workload
+
