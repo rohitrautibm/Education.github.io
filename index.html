@@ -1,70 +1,667 @@
-<h1 style="text-align:center"><strong><span style="color:#c0392b">Welcome to Db2 Education Sessions</span></strong></h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Db2 Education Series</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<p>&nbsp;</p>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-<ul>
-	<li>March 2023</li>
-</ul>
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
 
-<h2>Topic : Database Corruption and Recovery Options in Db2</h2>
+        header {
+            background: linear-gradient(135deg, #bbdefb 0%, #e1bee7 100%);
+            color: #1565c0;
+            padding: 50px 20px;
+            text-align: center;
+            border-bottom: 3px solid #90caf9;
+        }
 
-<p>Presentation : <a href="https://github.com/rohitrautibm/Education.github.io/blob/3bfb5621eb3f2390395307f7d23550089fc8819a/DB%20corruption%20and%20recovery%20options%20of%20db2dart%20command.pptx">Presentation </a></p>
+        header h1 {
+            font-size: 2.8em;
+            margin-bottom: 15px;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
 
-<p>Document :<a href="https://github.com/rohitrautibm/Education.github.io/blob/7422a026ee2b9d645856d701a630b661f74639f7/Training_corruption.txt"> Document</a></p>
+        .main-content {
+            display: flex;
+            background: #fafafa;
+        }
 
-<p>&nbsp;</p>
+        .sidebar {
+            width: 300px;
+            background: white;
+            border-right: 2px solid #e3f2fd;
+            padding: 30px 20px;
+            position: sticky;
+            top: 0;
+            height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
 
-<p>&nbsp;</p>
+        .sidebar h2 {
+            color: #1565c0;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e3f2fd;
+        }
 
-<ul>
-	<li>July 2023</li>
-</ul>
+        .sidebar-nav {
+            list-style: none;
+        }
 
-<h2>Topic : Db2 Database Monitoring</h2>
+        .sidebar-nav li {
+            margin-bottom: 12px;
+        }
 
-<p>Presentation : <a href="https://github.com/rohitrautibm/Education.github.io/blob/7422a026ee2b9d645856d701a630b661f74639f7/Db2%20Database%20Monitoring.pptx">Presentation</a></p>
+        .sidebar-nav a {
+            display: block;
+            color: #424242;
+            text-decoration: none;
+            padding: 12px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            border-left: 3px solid transparent;
+        }
 
-<p>Document : <a href="https://github.com/rohitrautibm/Education.github.io/blob/7422a026ee2b9d645856d701a630b661f74639f7/monitoring%20steps.txt">Document</a></p>
+        .sidebar-nav a:hover {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            border-left-color: #64b5f6;
+            transform: translateX(5px);
+        }
 
-<p>&nbsp;</p>
+        .sidebar-nav a.active {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            color: #1565c0;
+            border-left-color: #64b5f6;
+            font-weight: 600;
+        }
 
-<p>&nbsp;</p>
+        .session-date-nav {
+            font-size: 0.85em;
+            color: #1565c0;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 3px;
+        }
 
-<ul>
-	<li>September 2023</li>
-</ul>
+        .session-title-nav {
+            font-size: 0.95em;
+            display: block;
+        }
 
-<h2>Topic : Db2 Table Partitioning</h2>
+        .content {
+            flex: 1;
+            padding: 50px 40px;
+        }
 
-<p>Presentation : <a href="https://github.com/rohitrautibm/Education.github.io/blob/main/Db2%20Table%20Partitioning.pptx">Presentation</a></p>
-	
-<p>Document : <a href="https://github.com/rohitrautibm/Education.github.io/blob/main/Partition%20Table.txt">Document</a></p>
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            padding: 30px 20px;
+            background: white;
+            border-bottom: 2px solid #e3f2fd;
+            margin-bottom: 30px;
+            border-radius: 10px;
+        }
 
-<p>Script : <a href="https://github.com/rohitrautibm/Education.github.io/blob/main/Training%20Script.txt">Script</a></p>
+        .stat-item {
+            text-align: center;
+        }
 
-<p>&nbsp;</p>
+        .stat-number {
+            font-size: 2em;
+            font-weight: 700;
+            color: #1565c0;
+            display: block;
+        }
 
-<p>&nbsp;</p>
+        .stat-label {
+            color: #757575;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
 
-<ul>
-	<li>March 2024</li>
-</ul>
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
 
-<h2>Topic : WLM Implementation</h2>
-	
-<p>Document : <a href="https://github.com/rohitrautibm/Education.github.io/blob/main/WLM_training.txt">Document</a></p>
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #90caf9 0%, #ce93d8 100%);
+        }
 
-<p>&nbsp;</p>
+        .session-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 35px;
+            position: relative;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border: 2px solid #e3f2fd;
+            scroll-margin-top: 20px;
+        }
 
-<p>&nbsp;</p>
+        .session-card:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+            border-color: #90caf9;
+        }
 
-<ul>
-	<li>June 2024</li>
-</ul>
+        .session-card::before {
+            content: '';
+            position: absolute;
+            left: -55px;
+            top: 30px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border: 4px solid #64b5f6;
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px #e3f2fd;
+        }
 
-<h2>Topic : SSL Implementation</h2>
-	
-<p>Document : <a href="https://github.com/rohitrautibm/Education.github.io/blob/main/SSL%20configuration.pdf">Document</a></p>
+        .session-header {
+            margin-bottom: 20px;
+        }
 
+        .session-date {
+            display: inline-block;
+            background: linear-gradient(135deg, #64b5f6 0%, #ba68c8 100%);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(100, 181, 246, 0.3);
+        }
 
+        .session-card h2 {
+            color: #1565c0;
+            font-size: 1.6em;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
 
+        .session-description {
+            color: #616161;
+            font-size: 0.95em;
+            margin-bottom: 20px;
+        }
+
+        .resources {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .resource-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            color: #1565c0;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            font-size: 0.95em;
+        }
+
+        .resource-link:hover {
+            background: linear-gradient(135deg, #64b5f6 0%, #ba68c8 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(100, 181, 246, 0.4);
+        }
+
+        .resource-link::before {
+            content: "📄";
+            margin-right: 8px;
+            font-size: 1.1em;
+        }
+
+        .resource-link.presentation::before {
+            content: "📊";
+        }
+
+        .resource-link.script::before {
+            content: "📝";
+        }
+
+        footer {
+            background: linear-gradient(135deg, #bbdefb 0%, #e1bee7 100%);
+            color: #424242;
+            text-align: center;
+            padding: 25px;
+            font-size: 0.9em;
+            border-top: 3px solid #90caf9;
+        }
+
+        footer p {
+            font-weight: 500;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 250px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                border-right: none;
+                border-bottom: 2px solid #e3f2fd;
+            }
+
+            header h1 {
+                font-size: 2em;
+            }
+
+            .content {
+                padding: 30px 20px;
+            }
+
+            .timeline {
+                padding-left: 30px;
+            }
+
+            .session-card::before {
+                left: -45px;
+            }
+
+            .resources {
+                flex-direction: column;
+            }
+
+            .resource-link {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .stats-bar {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎓 Db2 Education Series</h1>
+        </header>
+
+        <div class="main-content">
+            <!-- Left Sidebar Navigation -->
+            <aside class="sidebar">
+                <h2>📚 Sessions Index</h2>
+                <ul class="sidebar-nav">
+                    <li>
+                        <a href="#session-march-2023">
+                            <span class="session-date-nav">March 2023</span>
+                            <span class="session-title-nav">Database Corruption and Recovery</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#session-july-2023">
+                            <span class="session-date-nav">July 2023</span>
+                            <span class="session-title-nav">Db2 Database Monitoring</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#session-september-2023">
+                            <span class="session-date-nav">September 2023</span>
+                            <span class="session-title-nav">Db2 Table Partitioning</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#session-march-2024">
+                            <span class="session-date-nav">March 2024</span>
+                            <span class="session-title-nav">WLM Implementation</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#session-june-2024">
+                            <span class="session-date-nav">June 2024</span>
+                            <span class="session-title-nav">SSL Implementation</span>
+                        </a>
+                    </li>
+                    <li style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #e3f2fd;">
+                        <a href="#feedback-section">
+                            <span class="session-date-nav">💬 Feedback</span>
+                            <span class="session-title-nav">Share Your Thoughts</span>
+                        </a>
+                    </li>
+                </ul>
+            </aside>
+
+            <!-- Main Content Area -->
+            <div class="content">
+                <div class="stats-bar">
+                    <div class="stat-item">
+                        <span class="stat-number">5</span>
+                        <span class="stat-label">Training Sessions</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">2023-2024</span>
+                        <span class="stat-label">Timeline</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">12+</span>
+                        <span class="stat-label">Resources</span>
+                    </div>
+                </div>
+
+                <div class="timeline">
+                    <!-- March 2023 Session -->
+                    <div class="session-card" id="session-march-2023">
+                        <div class="session-header">
+                            <span class="session-date">March 2023</span>
+                            <h2>Database Corruption and Recovery Options in Db2</h2>
+                            <p class="session-description">Learn about database corruption scenarios and recovery techniques using db2dart command</p>
+                        </div>
+                        <div class="resources">
+                            <a href="https://raw.githubusercontent.com/rohitrautibm/Education.github.io/3bfb5621eb3f2390395307f7d23550089fc8819a/DB%20corruption%20and%20recovery%20options%20of%20db2dart%20command.pptx" class="resource-link presentation" download="DB_corruption_recovery_db2dart.pptx">Presentation</a>
+                            <a href="https://raw.githubusercontent.com/rohitrautibm/Education.github.io/7422a026ee2b9d645856d701a630b661f74639f7/Training_corruption.txt" class="resource-link" download="Training_corruption.txt">Document</a>
+                        </div>
+                    </div>
+
+                    <!-- July 2023 Session -->
+                    <div class="session-card" id="session-july-2023">
+                        <div class="session-header">
+                            <span class="session-date">July 2023</span>
+                            <h2>Db2 Database Monitoring</h2>
+                            <p class="session-description">Master database monitoring techniques and best practices for optimal performance</p>
+                        </div>
+                        <div class="resources">
+                            <a href="https://raw.githubusercontent.com/rohitrautibm/Education.github.io/7422a026ee2b9d645856d701a630b661f74639f7/Db2%20Database%20Monitoring.pptx" class="resource-link presentation" download="Db2_Database_Monitoring.pptx">Presentation</a>
+                            <a href="https://raw.githubusercontent.com/rohitrautibm/Education.github.io/7422a026ee2b9d645856d701a630b661f74639f7/monitoring%20steps.txt" class="resource-link" download="monitoring_steps.txt">Document</a>
+                        </div>
+                    </div>
+
+                    <!-- September 2023 Session -->
+                    <div class="session-card" id="session-september-2023">
+                        <div class="session-header">
+                            <span class="session-date">September 2023</span>
+                            <h2>Db2 Table Partitioning</h2>
+                            <p class="session-description">Understand table partitioning strategies for improved query performance and data management</p>
+                        </div>
+                        <div class="resources">
+                            <a href="https://raw.githubusercontent.com/rohitrautibm/Education.github.io/main/Db2%20Table%20Partitioning.pptx" class="resource-link presentation" download="Db2_Table_Partitioning.pptx">Presentation</a>
+                            <a href="https://raw.githubusercontent.com/rohitrautibm/Education.github.io/main/Partition%20Table.txt" class="resource-link" download="Partition_Table.txt">Document</a>
+                            <a href="https://raw.githubusercontent.com/rohitrautibm/Education.github.io/main/Training%20Script.txt" class="resource-link script" download="Training_Script.txt">Script</a>
+                        </div>
+                    </div>
+
+                    <!-- March 2024 Session -->
+                    <div class="session-card" id="session-march-2024">
+                        <div class="session-header">
+                            <span class="session-date">March 2024</span>
+                            <h2>WLM Implementation</h2>
+                            <p class="session-description">Implement Workload Management for efficient resource allocation and query prioritization</p>
+                        </div>
+                        <div class="resources">
+                            <a href="https://raw.githubusercontent.com/rohitrautibm/Education.github.io/main/WLM_training.txt" class="resource-link" download="WLM_training.txt">Document</a>
+                        </div>
+                    </div>
+
+                    <!-- June 2024 Session -->
+                    <div class="session-card" id="session-june-2024">
+                        <div class="session-header">
+                            <span class="session-date">June 2024</span>
+                            <h2>SSL Implementation</h2>
+                            <p class="session-description">Configure SSL/TLS encryption for secure database connections and data protection</p>
+                        </div>
+                        <div class="resources">
+                            <a href="https://raw.githubusercontent.com/rohitrautibm/Education.github.io/main/SSL%20configuration.pdf" class="resource-link" download="SSL_configuration.pdf">Document</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feedback Section -->
+                <div class="session-card" id="feedback-section" style="background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); border: 2px solid #90caf9;">
+                    <div class="session-header">
+                        <span class="session-date">💬 Feedback</span>
+                        <h2>Share Your Thoughts</h2>
+                        <p class="session-description">We value your feedback! Let us know how we can improve our training sessions.</p>
+                    </div>
+                    
+                    <form id="feedbackForm" style="background: white; padding: 30px; border-radius: 10px; margin-top: 20px;">
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; color: #424242; font-weight: 600; margin-bottom: 8px;">Your Name</label>
+                            <input type="text" id="feedbackName" required style="width: 100%; padding: 12px; border: 2px solid #e3f2fd; border-radius: 8px; font-size: 1em;">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; color: #424242; font-weight: 600; margin-bottom: 8px;">Email (Optional)</label>
+                            <input type="email" id="feedbackEmail" style="width: 100%; padding: 12px; border: 2px solid #e3f2fd; border-radius: 8px; font-size: 1em;">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; color: #424242; font-weight: 600; margin-bottom: 8px;">Session (Optional)</label>
+                            <select id="feedbackSession" style="width: 100%; padding: 12px; border: 2px solid #e3f2fd; border-radius: 8px; font-size: 1em; background: white;">
+                                <option value="">Select a session...</option>
+                                <option value="March 2023 - Database Corruption and Recovery">March 2023 - Database Corruption and Recovery</option>
+                                <option value="July 2023 - Db2 Database Monitoring">July 2023 - Db2 Database Monitoring</option>
+                                <option value="September 2023 - Db2 Table Partitioning">September 2023 - Db2 Table Partitioning</option>
+                                <option value="March 2024 - WLM Implementation">March 2024 - WLM Implementation</option>
+                                <option value="June 2024 - SSL Implementation">June 2024 - SSL Implementation</option>
+                                <option value="General Feedback">General Feedback</option>
+                            </select>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; color: #424242; font-weight: 600; margin-bottom: 8px;">Your Feedback</label>
+                            <textarea id="feedbackMessage" required rows="6" style="width: 100%; padding: 12px; border: 2px solid #e3f2fd; border-radius: 8px; font-size: 1em; resize: vertical;" placeholder="Share your thoughts, suggestions, or questions..."></textarea>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; color: #424242; font-weight: 600; margin-bottom: 8px;">Rating</label>
+                            <div id="ratingStars" style="font-size: 2em; cursor: pointer;">
+                                <span class="star" data-rating="1">☆</span>
+                                <span class="star" data-rating="2">☆</span>
+                                <span class="star" data-rating="3">☆</span>
+                                <span class="star" data-rating="4">☆</span>
+                                <span class="star" data-rating="5">☆</span>
+                            </div>
+                            <input type="hidden" id="feedbackRating" value="0">
+                        </div>
+                        
+                        <button type="submit" style="background: linear-gradient(135deg, #64b5f6 0%, #ba68c8 100%); color: white; border: none; padding: 15px 40px; border-radius: 25px; cursor: pointer; font-size: 1.1em; font-weight: 600; width: 100%; transition: all 0.3s ease;">
+                            Submit Feedback
+                        </button>
+                        
+                        <div id="feedbackSuccess" style="display: none; background: #c8e6c9; color: #2e7d32; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #4caf50;">
+                            ✓ Thank you for your feedback! We appreciate your input.
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2024 Db2 Education Series | All training materials are for educational purposes</p>
+        </footer>
+    </div>
+
+    <script>
+        // Smooth scroll and active state management
+        document.querySelectorAll('.sidebar-nav a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remove active class from all links
+                document.querySelectorAll('.sidebar-nav a').forEach(l => l.classList.remove('active'));
+                
+                // Add active class to clicked link
+                this.classList.add('active');
+                
+                // Smooth scroll to target
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Highlight active section on scroll
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('.session-card');
+            const navLinks = document.querySelectorAll('.sidebar-nav a');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= (sectionTop - 100)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Star rating system
+        const stars = document.querySelectorAll('.star');
+        const ratingInput = document.getElementById('feedbackRating');
+        
+        stars.forEach(star => {
+            star.addEventListener('click', function() {
+                const rating = this.getAttribute('data-rating');
+                ratingInput.value = rating;
+                
+                // Update star display
+                stars.forEach(s => {
+                    const starRating = s.getAttribute('data-rating');
+                    if (starRating <= rating) {
+                        s.textContent = '★';
+                        s.style.color = '#ffd700';
+                    } else {
+                        s.textContent = '☆';
+                        s.style.color = '#424242';
+                    }
+                });
+            });
+            
+            star.addEventListener('mouseenter', function() {
+                const rating = this.getAttribute('data-rating');
+                stars.forEach(s => {
+                    const starRating = s.getAttribute('data-rating');
+                    if (starRating <= rating) {
+                        s.textContent = '★';
+                        s.style.color = '#ffd700';
+                    }
+                });
+            });
+        });
+        
+        document.getElementById('ratingStars').addEventListener('mouseleave', function() {
+            const currentRating = ratingInput.value;
+            stars.forEach(s => {
+                const starRating = s.getAttribute('data-rating');
+                if (starRating <= currentRating) {
+                    s.textContent = '★';
+                    s.style.color = '#ffd700';
+                } else {
+                    s.textContent = '☆';
+                    s.style.color = '#424242';
+                }
+            });
+        });
+
+        // Feedback form submission
+        document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('feedbackName').value;
+            const email = document.getElementById('feedbackEmail').value;
+            const session = document.getElementById('feedbackSession').value;
+            const message = document.getElementById('feedbackMessage').value;
+            const rating = document.getElementById('feedbackRating').value;
+            
+            // Create feedback object
+            const feedback = {
+                name: name,
+                email: email,
+                session: session || 'General Feedback',
+                message: message,
+                rating: rating,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Store in localStorage (you can replace this with actual backend submission)
+            let feedbacks = JSON.parse(localStorage.getItem('db2Feedbacks') || '[]');
+            feedbacks.push(feedback);
+            localStorage.setItem('db2Feedbacks', JSON.stringify(feedbacks));
+            
+            // Show success message
+            document.getElementById('feedbackSuccess').style.display = 'block';
+            
+            // Reset form
+            this.reset();
+            ratingInput.value = '0';
+            stars.forEach(s => {
+                s.textContent = '☆';
+                s.style.color = '#424242';
+            });
+            
+            // Hide success message after 5 seconds
+            setTimeout(() => {
+                document.getElementById('feedbackSuccess').style.display = 'none';
+            }, 5000);
+            
+            // Scroll to top of feedback section
+            document.getElementById('feedback-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            // Log feedback (for demonstration - remove in production)
+            console.log('Feedback submitted:', feedback);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Add New Session</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #bbdefb 0%, #e1bee7 100%);
+            color: #1565c0;
+            padding: 30px;
+            text-align: center;
+            border-bottom: 3px solid #90caf9;
+        }
+
+        header h1 {
+            font-size: 2em;
+            font-weight: 700;
+        }
+
+        .nav-links {
+            padding: 15px 30px;
+            background: #f5f5f5;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .nav-links a {
+            color: #1565c0;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background: #e3f2fd;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            color: #424242;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        input[type="text"],
+        input[type="month"],
+        textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e3f2fd;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="month"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #64b5f6;
+            box-shadow: 0 0 0 3px rgba(100, 181, 246, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .resource-group {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 2px solid #e3f2fd;
+        }
+
+        .resource-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .resource-header h3 {
+            color: #1565c0;
+            font-size: 1.1em;
+        }
+
+        .btn-remove {
+            background: #ef5350;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .btn-remove:hover {
+            background: #e53935;
+        }
+
+        .btn-add-resource {
+            background: linear-gradient(135deg, #64b5f6 0%, #ba68c8 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-add-resource:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(100, 181, 246, 0.4);
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #64b5f6 0%, #ba68c8 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(100, 181, 246, 0.4);
+        }
+
+        .success-message {
+            background: #c8e6c9;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            border-left: 4px solid #4caf50;
+        }
+
+        .resource-type-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e3f2fd;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+            background: white;
+            cursor: pointer;
+        }
+
+        .preview-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            border: 2px solid #e3f2fd;
+        }
+
+        .preview-section h3 {
+            color: #1565c0;
+            margin-bottom: 15px;
+        }
+
+        #preview-output {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            min-height: 100px;
+        }
+
+        @media (max-width: 768px) {
+            .form-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📝 Add New Education Session</h1>
+        </header>
+
+        <div class="nav-links">
+            <a href="index.html">← Back to Sessions</a>
+        </div>
+
+        <div class="form-container">
+            <div class="success-message" id="successMessage">
+                ✓ Session added successfully! The HTML code has been generated below.
+            </div>
+
+            <form id="sessionForm">
+                <div class="form-group">
+                    <label for="sessionDate">Session Date (Month & Year)</label>
+                    <input type="month" id="sessionDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="sessionTitle">Session Title</label>
+                    <input type="text" id="sessionTitle" placeholder="e.g., Db2 Performance Tuning" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="sessionDescription">Session Description</label>
+                    <textarea id="sessionDescription" placeholder="Brief description of the session topic..." required></textarea>
+                </div>
+
+                <h3 style="color: #1565c0; margin-bottom: 15px;">Resources</h3>
+                
+                <div id="resourcesContainer"></div>
+
+                <button type="button" class="btn-add-resource" onclick="addResource()">+ Add Resource</button>
+
+                <button type="submit" class="btn-submit">Generate Session HTML</button>
+            </form>
+
+            <div class="preview-section">
+                <h3>Generated HTML Code</h3>
+                <p style="color: #757575; margin-bottom: 10px; font-size: 0.9em;">Copy this code and paste it into your index.html file in the timeline section</p>
+                <div id="preview-output">
+                    <em style="color: #9e9e9e;">Fill out the form above and click "Generate Session HTML" to see the code here...</em>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let resourceCount = 0;
+
+        function addResource() {
+            resourceCount++;
+            const container = document.getElementById('resourcesContainer');
+            const resourceDiv = document.createElement('div');
+            resourceDiv.className = 'resource-group';
+            resourceDiv.id = `resource-${resourceCount}`;
+            resourceDiv.innerHTML = `
+                <div class="resource-header">
+                    <h3>Resource ${resourceCount}</h3>
+                    <button type="button" class="btn-remove" onclick="removeResource(${resourceCount})">Remove</button>
+                </div>
+                <div class="form-group">
+                    <label>Resource Type</label>
+                    <select class="resource-type-select" name="resourceType-${resourceCount}">
+                        <option value="document">📄 Document</option>
+                        <option value="presentation">📊 Presentation</option>
+                        <option value="script">📝 Script</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Resource Name</label>
+                    <input type="text" name="resourceName-${resourceCount}" placeholder="e.g., Training Document" required>
+                </div>
+                <div class="form-group">
+                    <label>Resource URL</label>
+                    <input type="text" name="resourceUrl-${resourceCount}" placeholder="https://github.com/..." required>
+                </div>
+            `;
+            container.appendChild(resourceDiv);
+        }
+
+        function removeResource(id) {
+            const element = document.getElementById(`resource-${id}`);
+            if (element) {
+                element.remove();
+            }
+        }
+
+        // Add first resource by default
+        addResource();
+
+        document.getElementById('sessionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const date = document.getElementById('sessionDate').value;
+            const title = document.getElementById('sessionTitle').value;
+            const description = document.getElementById('sessionDescription').value;
+            
+            // Format date
+            const dateObj = new Date(date + '-01');
+            const monthYear = dateObj.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            
+            // Collect resources
+            let resourcesHTML = '';
+            const resourceGroups = document.querySelectorAll('.resource-group');
+            
+            resourceGroups.forEach((group, index) => {
+                const typeSelect = group.querySelector('select');
+                const nameInput = group.querySelector('input[name^="resourceName"]');
+                const urlInput = group.querySelector('input[name^="resourceUrl"]');
+                
+                if (nameInput && urlInput && nameInput.value && urlInput.value) {
+                    const type = typeSelect.value;
+                    const className = type === 'document' ? 'resource-link' : `resource-link ${type}`;
+                    resourcesHTML += `                    <a href="${urlInput.value}" class="${className}" target="_blank">${nameInput.value}</a>\n`;
+                }
+            });
+            
+            // Generate HTML
+            const html = `                <!-- ${monthYear} Session -->
+                <div class="session-card">
+                    <div class="session-header">
+                        <span class="session-date">${monthYear}</span>
+                        <h2>${title}</h2>
+                        <p class="session-description">${description}</p>
+                    </div>
+                    <div class="resources">
+${resourcesHTML}                    </div>
+                </div>`;
+            
+            // Display result
+            document.getElementById('preview-output').innerHTML = `<pre style="white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; font-size: 0.9em; color: #2c3e50;">${escapeHtml(html)}</pre>`;
+            
+            // Show success message
+            document.getElementById('successMessage').style.display = 'block';
+            
+            // Scroll to preview
+            document.getElementById('preview-output').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&',
+                '<': '<',
+                '>': '>',
+                '"': '"',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+    </script>
+</body>
+</html>
