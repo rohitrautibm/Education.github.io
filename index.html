@@ -440,27 +440,26 @@
         // Sessions data (can also be loaded from sessions.json when hosted on a server)
         const sessionsData = {
             "sessions": [
-              {
-     			 "id": "session-May-2026",
-    			  "date": "May 2026",
-     			 "title": "Db2 Audit",
-     			 "description": "How to configure Db2 Audit",
-     			 "resources": [
-       				 {
-         			 "type": "presentation",
-        			  "name": "presentation",
-        			  "url": "https://github.com/rohitrautibm/Education.github.io/blob/main/Db2%20Audit.pptx",
-         			 "filename": "Db2 Audit.pptx"
-       				 }
-       		 {
-          		"type": "document",
-         		 "name": "Document",
-         		 "url": "https://drive.google.com/uc?export=download&id=1AbCxyzXYZ12345abcDEF",
-         		 "filename": "Customer training Topic Db2 LUW - Auditing Db2 activities-20260513_150346-Meeting Recording.mp4.zip"
-       		 }
-    		  ]
-      }
-    
+                {
+                    "id": "session-may-2026",
+                    "date": "May 2026",
+                    "title": "Db2 Audit",
+                    "description": "How to configure Db2 Audit",
+                    "resources": [
+                        {
+                            "type": "presentation",
+                            "name": "Presentation",
+                            "url": "https://raw.githubusercontent.com/rohitrautibm/Education.github.io/main/Db2%20Audit.pptx",
+                            "filename": "Db2_Audit.pptx"
+                        },
+                        {
+                            "type": "document",
+                            "name": "Document",
+                            "url": "https://drive.google.com/uc?export=download&id=1AbCxyzXYZ12345abcDEF",
+                            "filename": "Db2_Auditing_Recording.mp4.zip"
+                        }
+                    ]
+                },
                 {
                     "id": "session-june-2024",
                     "date": "June 2024",
@@ -563,15 +562,24 @@
             try {
                 let data = sessionsData;
                 
-                // Try to load from sessions.json if available (for server environments)
-                try {
-                    const response = await fetch('sessions.json');
-                    if (response.ok) {
-                        data = await response.json();
+                // Only try to load from sessions.json if we're on a server (not file://)
+                if (window.location.protocol !== 'file:') {
+                    try {
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), 2000); // 2 second timeout
+                        
+                        const response = await fetch('sessions.json', { signal: controller.signal });
+                        clearTimeout(timeoutId);
+                        
+                        if (response.ok) {
+                            data = await response.json();
+                            console.log('Loaded sessions from sessions.json');
+                        }
+                    } catch (e) {
+                        console.log('Using embedded sessions data:', e.message);
                     }
-                } catch (e) {
-                    // Use embedded data if fetch fails (e.g., file:// protocol)
-                    console.log('Using embedded sessions data');
+                } else {
+                    console.log('Using embedded sessions data (file:// protocol)');
                 }
                 
                 // Update session count
