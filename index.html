@@ -378,20 +378,20 @@
                         <p class="session-description">We value your feedback! Let us know how we can improve our training sessions.</p>
                     </div>
                     
-                    <form id="feedbackForm" style="background: white; padding: 30px; border-radius: 10px; margin-top: 20px;">
+                    <form id="feedbackForm" action="https://formspree.io/f/xanyqjqe" method="POST" style="background: white; padding: 30px; border-radius: 10px; margin-top: 20px;">
                         <div style="margin-bottom: 20px;">
                             <label style="display: block; color: #424242; font-weight: 600; margin-bottom: 8px;">Your Name</label>
-                            <input type="text" id="feedbackName" required style="width: 100%; padding: 12px; border: 2px solid #e3f2fd; border-radius: 8px; font-size: 1em;">
+                            <input type="text" name="name" id="feedbackName" required style="width: 100%; padding: 12px; border: 2px solid #e3f2fd; border-radius: 8px; font-size: 1em;">
                         </div>
                         
                         <div style="margin-bottom: 20px;">
                             <label style="display: block; color: #424242; font-weight: 600; margin-bottom: 8px;">Email (Optional)</label>
-                            <input type="email" id="feedbackEmail" style="width: 100%; padding: 12px; border: 2px solid #e3f2fd; border-radius: 8px; font-size: 1em;">
+                            <input type="email" name="_replyto" id="feedbackEmail" style="width: 100%; padding: 12px; border: 2px solid #e3f2fd; border-radius: 8px; font-size: 1em;">
                         </div>
                         
                         <div style="margin-bottom: 20px;">
                             <label style="display: block; color: #424242; font-weight: 600; margin-bottom: 8px;">Session (Optional)</label>
-                            <select id="feedbackSession" style="width: 100%; padding: 12px; border: 2px solid #e3f2fd; border-radius: 8px; font-size: 1em; background: white;">
+                            <select name="session" id="feedbackSession" style="width: 100%; padding: 12px; border: 2px solid #e3f2fd; border-radius: 8px; font-size: 1em; background: white;">
                                 <option value="">Select a session...</option>
                                 <option value="May 2026 - Db2 Audit">May 2026 - Db2 Audit</option>
                                 <option value="June 2024 - SSL Implementation">June 2024 - SSL Implementation</option>
@@ -405,7 +405,7 @@
                         
                         <div style="margin-bottom: 20px;">
                             <label style="display: block; color: #424242; font-weight: 600; margin-bottom: 8px;">Your Feedback</label>
-                            <textarea id="feedbackMessage" required rows="6" style="width: 100%; padding: 12px; border: 2px solid #e3f2fd; border-radius: 8px; font-size: 1em; resize: vertical;" placeholder="Share your thoughts, suggestions, or questions..."></textarea>
+                            <textarea name="message" id="feedbackMessage" required rows="6" style="width: 100%; padding: 12px; border: 2px solid #e3f2fd; border-radius: 8px; font-size: 1em; resize: vertical;" placeholder="Share your thoughts, suggestions, or questions..."></textarea>
                         </div>
                         
                         <div style="margin-bottom: 20px;">
@@ -417,7 +417,7 @@
                                 <span class="star" data-rating="4">☆</span>
                                 <span class="star" data-rating="5">☆</span>
                             </div>
-                            <input type="hidden" id="feedbackRating" value="0">
+                            <input type="hidden" name="rating" id="feedbackRating" value="0">
                         </div>
                         
                         <button type="submit" style="background: linear-gradient(135deg, #64b5f6 0%, #ba68c8 100%); color: white; border: none; padding: 15px 40px; border-radius: 25px; cursor: pointer; font-size: 1.1em; font-weight: 600; width: 100%; transition: all 0.3s ease;">
@@ -767,52 +767,71 @@
             });
         });
 
-        // Feedback form submission
-        document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+        // Feedback form submission with Formspree
+        document.getElementById('feedbackForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const name = document.getElementById('feedbackName').value;
-            const email = document.getElementById('feedbackEmail').value;
-            const session = document.getElementById('feedbackSession').value;
-            const message = document.getElementById('feedbackMessage').value;
-            const rating = document.getElementById('feedbackRating').value;
+            const form = this;
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.textContent;
             
-            // Create feedback object
-            const feedback = {
-                name: name,
-                email: email,
-                session: session || 'General Feedback',
-                message: message,
-                rating: rating,
-                timestamp: new Date().toISOString()
-            };
+            // Disable button and show loading state
+            submitButton.disabled = true;
+            submitButton.textContent = 'Sending...';
             
-            // Store in localStorage (you can replace this with actual backend submission)
-            let feedbacks = JSON.parse(localStorage.getItem('db2Feedbacks') || '[]');
-            feedbacks.push(feedback);
-            localStorage.setItem('db2Feedbacks', JSON.stringify(feedbacks));
-            
-            // Show success message
-            document.getElementById('feedbackSuccess').style.display = 'block';
-            
-            // Reset form
-            this.reset();
-            ratingInput.value = '0';
-            stars.forEach(s => {
-                s.textContent = '☆';
-                s.style.color = '#424242';
-            });
-            
-            // Hide success message after 5 seconds
-            setTimeout(() => {
-                document.getElementById('feedbackSuccess').style.display = 'none';
-            }, 5000);
-            
-            // Scroll to top of feedback section
-            document.getElementById('feedback-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
-            
-            // Log feedback (for demonstration - remove in production)
-            console.log('Feedback submitted:', feedback);
+            try {
+                // Submit form to Formspree
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: new FormData(form),
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    // Show success message
+                    document.getElementById('feedbackSuccess').style.display = 'block';
+                    document.getElementById('feedbackSuccess').innerHTML = '✓ Thank you for your feedback! We have received your message and will review it soon.';
+                    
+                    // Reset form
+                    form.reset();
+                    ratingInput.value = '0';
+                    stars.forEach(s => {
+                        s.textContent = '☆';
+                        s.style.color = '#424242';
+                    });
+                    
+                    // Hide success message after 10 seconds
+                    setTimeout(() => {
+                        document.getElementById('feedbackSuccess').style.display = 'none';
+                    }, 10000);
+                    
+                    // Scroll to top of feedback section
+                    document.getElementById('feedback-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                    throw new Error('Form submission failed');
+                }
+            } catch (error) {
+                // Show error message
+                document.getElementById('feedbackSuccess').style.display = 'block';
+                document.getElementById('feedbackSuccess').style.background = '#ffcdd2';
+                document.getElementById('feedbackSuccess').style.color = '#c62828';
+                document.getElementById('feedbackSuccess').style.borderLeft = '4px solid #f44336';
+                document.getElementById('feedbackSuccess').innerHTML = '⚠️ There was an error submitting your feedback. Please try again or email us directly at rohit.rauti@ibm.com';
+                
+                setTimeout(() => {
+                    document.getElementById('feedbackSuccess').style.display = 'none';
+                    // Reset colors
+                    document.getElementById('feedbackSuccess').style.background = '#c8e6c9';
+                    document.getElementById('feedbackSuccess').style.color = '#2e7d32';
+                    document.getElementById('feedbackSuccess').style.borderLeft = '4px solid #4caf50';
+                }, 10000);
+            } finally {
+                // Re-enable button
+                submitButton.disabled = false;
+                submitButton.textContent = originalButtonText;
+            }
         });
     </script>
 </body>
