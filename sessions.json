@@ -1,0 +1,98 @@
+{
+  "sessions": [
+    {
+      "id": "session-june-2024",
+      "date": "June 2024",
+      "title": "SSL Implementation",
+      "description": "Configure SSL/TLS encryption for secure database connections and data protection",
+      "resources": [
+        {
+          "type": "document",
+          "name": "Document",
+          "url": "https://raw.githubusercontent.com/rohitrautibm/Education.github.io/main/SSL%20configuration.pdf",
+          "filename": "SSL_configuration.pdf"
+        }
+      ]
+    },
+    {
+      "id": "session-march-2024",
+      "date": "March 2024",
+      "title": "WLM Implementation",
+      "description": "Implement Workload Management for efficient resource allocation and query prioritization",
+      "resources": [
+        {
+          "type": "document",
+          "name": "Document",
+          "url": "https://raw.githubusercontent.com/rohitrautibm/Education.github.io/main/WLM_training.txt",
+          "filename": "WLM_training.txt"
+        }
+      ]
+    },
+    {
+      "id": "session-september-2023",
+      "date": "September 2023",
+      "title": "Db2 Table Partitioning",
+      "description": "Understand table partitioning strategies for improved query performance and data management",
+      "resources": [
+        {
+          "type": "presentation",
+          "name": "Presentation",
+          "url": "https://raw.githubusercontent.com/rohitrautibm/Education.github.io/main/Db2%20Table%20Partitioning.pptx",
+          "filename": "Db2_Table_Partitioning.pptx"
+        },
+        {
+          "type": "document",
+          "name": "Document",
+          "url": "https://raw.githubusercontent.com/rohitrautibm/Education.github.io/main/Partition%20Table.txt",
+          "filename": "Partition_Table.txt"
+        },
+        {
+          "type": "script",
+          "name": "Script",
+          "url": "https://raw.githubusercontent.com/rohitrautibm/Education.github.io/main/Training%20Script.txt",
+          "filename": "Training_Script.txt"
+        }
+      ]
+    },
+    {
+      "id": "session-july-2023",
+      "date": "July 2023",
+      "title": "Db2 Database Monitoring",
+      "description": "Master database monitoring techniques and best practices for optimal performance",
+      "resources": [
+        {
+          "type": "presentation",
+          "name": "Presentation",
+          "url": "https://raw.githubusercontent.com/rohitrautibm/Education.github.io/7422a026ee2b9d645856d701a630b661f74639f7/Db2%20Database%20Monitoring.pptx",
+          "filename": "Db2_Database_Monitoring.pptx"
+        },
+        {
+          "type": "document",
+          "name": "Document",
+          "url": "https://raw.githubusercontent.com/rohitrautibm/Education.github.io/7422a026ee2b9d645856d701a630b661f74639f7/monitoring%20steps.txt",
+          "filename": "monitoring_steps.txt"
+        }
+      ]
+    },
+    {
+      "id": "session-march-2023",
+      "date": "March 2023",
+      "title": "Database Corruption and Recovery Options in Db2",
+      "description": "Learn about database corruption scenarios and recovery techniques using db2dart command",
+      "resources": [
+        {
+          "type": "presentation",
+          "name": "Presentation",
+          "url": "https://raw.githubusercontent.com/rohitrautibm/Education.github.io/3bfb5621eb3f2390395307f7d23550089fc8819a/DB%20corruption%20and%20recovery%20options%20of%20db2dart%20command.pptx",
+          "filename": "DB_corruption_recovery_db2dart.pptx"
+        },
+        {
+          "type": "document",
+          "name": "Document",
+          "url": "https://raw.githubusercontent.com/rohitrautibm/Education.github.io/7422a026ee2b9d645856d701a630b661f74639f7/Training_corruption.txt",
+          "filename": "Training_corruption.txt"
+        }
+      ]
+    }
+  ]
+}

@@ -298,7 +298,10 @@
                 </div>
                 <div class="form-group">
                     <label>Resource URL</label>
-                    <input type="text" name="resourceUrl-${resourceCount}" placeholder="https://github.com/..." required>
+                    <input type="text" name="resourceUrl-${resourceCount}" placeholder="https://drive.google.com/... or https://github.com/..." required>
+                    <small style="color: #757575; font-size: 0.85em; display: block; margin-top: 5px;">
+                        💡 For Google Drive: Paste sharing link, it will be auto-converted to direct download
+                    </small>
                 </div>
             `;
             container.appendChild(resourceDiv);
@@ -314,6 +317,35 @@
         // Add first resource by default
         addResource();
 
+        // Function to convert Google Drive sharing link to direct download link
+        function convertGoogleDriveLink(url) {
+            // Check if it's a Google Drive link
+            if (url.includes('drive.google.com')) {
+                // Extract file ID from various Google Drive URL formats
+                let fileId = null;
+                
+                // Format: https://drive.google.com/file/d/FILE_ID/view
+                const match1 = url.match(/\/file\/d\/([^\/]+)/);
+                if (match1) {
+                    fileId = match1[1];
+                }
+                
+                // Format: https://drive.google.com/open?id=FILE_ID
+                const match2 = url.match(/[?&]id=([^&]+)/);
+                if (match2) {
+                    fileId = match2[1];
+                }
+                
+                if (fileId) {
+                    // Return direct download link
+                    return `https://drive.google.com/uc?export=download&id=${fileId}&confirm=t`;
+                }
+            }
+            
+            // If not a Google Drive link or couldn't extract ID, return original URL
+            return url;
+        }
+
         document.getElementById('sessionForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -326,7 +358,7 @@
             const monthYear = dateObj.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
             
             // Collect resources
-            let resourcesHTML = '';
+            const resources = [];
             const resourceGroups = document.querySelectorAll('.resource-group');
             
             resourceGroups.forEach((group, index) => {
@@ -336,12 +368,65 @@
                 
                 if (nameInput && urlInput && nameInput.value && urlInput.value) {
                     const type = typeSelect.value;
-                    const className = type === 'document' ? 'resource-link' : `resource-link ${type}`;
-                    resourcesHTML += `                    <a href="${urlInput.value}" class="${className}" target="_blank">${nameInput.value}</a>\n`;
+                    
+                    // Convert Google Drive links to direct download format
+                    const downloadUrl = convertGoogleDriveLink(urlInput.value);
+                    
+                    resources.push({
+                        type: type,
+                        name: nameInput.value,
+                        url: downloadUrl
+                    });
                 }
             });
             
-            // Generate HTML
+            // Send to backend API
+            fetch('/api/add-session', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    date: date,
+                    title: title,
+                    description: description,
+                    resources: resources
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    document.getElementById('successMessage').style.display = 'block';
+                    document.getElementById('successMessage').innerHTML = '✓ Session added successfully! The page has been updated. <a href="index.html" style="color: #1565c0; text-decoration: underline;">View the updated page</a>';
+                    
+                    // Reset form
+                    document.getElementById('sessionForm').reset();
+                    document.getElementById('resourcesContainer').innerHTML = '';
+                    resourceCount = 0;
+                    addResource();
+                    
+                    // Hide success message after 10 seconds
+                    setTimeout(() => {
+                        document.getElementById('successMessage').style.display = 'none';
+                    }, 10000);
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error adding session. Make sure the server is running (npm start)');
+            });
+            
+            // Also generate HTML preview for manual use if needed
+            let resourcesHTML = '';
+            resources.forEach(resource => {
+                const className = resource.type === 'document' ? 'resource-link' : `resource-link ${resource.type}`;
+                const filename = resource.name.replace(/[^a-z0-9]/gi, '_');
+                resourcesHTML += `                            <a href="${resource.url}" class="${className}" download="${filename}">${resource.name}</a>\n`;
+            });
+            
             const html = `                <!-- ${monthYear} Session -->
                 <div class="session-card">
                     <div class="session-header">
