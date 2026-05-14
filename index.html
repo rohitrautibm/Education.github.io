@@ -335,37 +335,8 @@
             <!-- Left Sidebar Navigation -->
             <aside class="sidebar">
                 <h2>📚 Sessions Index</h2>
-                <ul class="sidebar-nav">
-                    <li>
-                        <a href="#session-june-2024">
-                            <span class="session-date-nav">June 2024</span>
-                            <span class="session-title-nav">SSL Implementation</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#session-march-2024">
-                            <span class="session-date-nav">March 2024</span>
-                            <span class="session-title-nav">WLM Implementation</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#session-september-2023">
-                            <span class="session-date-nav">September 2023</span>
-                            <span class="session-title-nav">Db2 Table Partitioning</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#session-july-2023">
-                            <span class="session-date-nav">July 2023</span>
-                            <span class="session-title-nav">Db2 Database Monitoring</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#session-march-2023">
-                            <span class="session-date-nav">March 2023</span>
-                            <span class="session-title-nav">Database Corruption and Recovery</span>
-                        </a>
-                    </li>
+                <ul class="sidebar-nav" id="sidebarNav">
+                    <!-- Sessions will be loaded dynamically -->
                     <li style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #e3f2fd;">
                         <a href="#feedback-section">
                             <span class="session-date-nav">💬 Feedback</span>
@@ -392,69 +363,10 @@
                     </div>
                 </div>
 
-                <div class="timeline">
-                    <!-- June 2024 Session -->
-                    <div class="session-card" id="session-june-2024">
-                        <div class="session-header">
-                            <span class="session-date">June 2024</span>
-                            <h2>SSL Implementation</h2>
-                            <p class="session-description">Configure SSL/TLS encryption for secure database connections and data protection</p>
-                        </div>
-                        <div class="resources">
-                            <a href="https://raw.githubusercontent.com/rohitrautibm/Education.github.io/main/SSL%20configuration.pdf" class="resource-link" download="SSL_configuration.pdf">Document</a>
-                        </div>
-                    </div>
-
-                    <!-- March 2024 Session -->
-                    <div class="session-card" id="session-march-2024">
-                        <div class="session-header">
-                            <span class="session-date">March 2024</span>
-                            <h2>WLM Implementation</h2>
-                            <p class="session-description">Implement Workload Management for efficient resource allocation and query prioritization</p>
-                        </div>
-                        <div class="resources">
-                            <a href="https://raw.githubusercontent.com/rohitrautibm/Education.github.io/main/WLM_training.txt" class="resource-link" download="WLM_training.txt">Document</a>
-                        </div>
-                    </div>
-
-                    <!-- September 2023 Session -->
-                    <div class="session-card" id="session-september-2023">
-                        <div class="session-header">
-                            <span class="session-date">September 2023</span>
-                            <h2>Db2 Table Partitioning</h2>
-                            <p class="session-description">Understand table partitioning strategies for improved query performance and data management</p>
-                        </div>
-                        <div class="resources">
-                            <a href="https://raw.githubusercontent.com/rohitrautibm/Education.github.io/main/Db2%20Table%20Partitioning.pptx" class="resource-link presentation" download="Db2_Table_Partitioning.pptx">Presentation</a>
-                            <a href="https://raw.githubusercontent.com/rohitrautibm/Education.github.io/main/Partition%20Table.txt" class="resource-link" download="Partition_Table.txt">Document</a>
-                            <a href="https://raw.githubusercontent.com/rohitrautibm/Education.github.io/main/Training%20Script.txt" class="resource-link script" download="Training_Script.txt">Script</a>
-                        </div>
-                    </div>
-
-                    <!-- July 2023 Session -->
-                    <div class="session-card" id="session-july-2023">
-                        <div class="session-header">
-                            <span class="session-date">July 2023</span>
-                            <h2>Db2 Database Monitoring</h2>
-                            <p class="session-description">Master database monitoring techniques and best practices for optimal performance</p>
-                        </div>
-                        <div class="resources">
-                            <a href="https://raw.githubusercontent.com/rohitrautibm/Education.github.io/7422a026ee2b9d645856d701a630b661f74639f7/Db2%20Database%20Monitoring.pptx" class="resource-link presentation" download="Db2_Database_Monitoring.pptx">Presentation</a>
-                            <a href="https://raw.githubusercontent.com/rohitrautibm/Education.github.io/7422a026ee2b9d645856d701a630b661f74639f7/monitoring%20steps.txt" class="resource-link" download="monitoring_steps.txt">Document</a>
-                        </div>
-                    </div>
-
-                    <!-- March 2023 Session -->
-                    <div class="session-card" id="session-march-2023">
-                        <div class="session-header">
-                            <span class="session-date">March 2023</span>
-                            <h2>Database Corruption and Recovery Options in Db2</h2>
-                            <p class="session-description">Learn about database corruption scenarios and recovery techniques using db2dart command</p>
-                        </div>
-                        <div class="resources">
-                            <a href="https://raw.githubusercontent.com/rohitrautibm/Education.github.io/3bfb5621eb3f2390395307f7d23550089fc8819a/DB%20corruption%20and%20recovery%20options%20of%20db2dart%20command.pptx" class="resource-link presentation" download="DB_corruption_recovery_db2dart.pptx">Presentation</a>
-                            <a href="https://raw.githubusercontent.com/rohitrautibm/Education.github.io/7422a026ee2b9d645856d701a630b661f74639f7/Training_corruption.txt" class="resource-link" download="Training_corruption.txt">Document</a>
-                        </div>
+                <div class="timeline" id="sessionsTimeline">
+                    <!-- Sessions will be loaded dynamically from sessions.json -->
+                    <div style="text-align: center; padding: 40px; color: #757575;">
+                        <p>Loading sessions...</p>
                     </div>
                 </div>
 
@@ -525,7 +437,107 @@
     </div>
 
     <script>
-        // Smooth scroll and active state management
+        // Load sessions from sessions.json
+        async function loadSessions() {
+            try {
+                const response = await fetch('sessions.json');
+                const data = await response.json();
+                
+                // Update session count
+                document.querySelector('.stat-number').textContent = data.sessions.length;
+                
+                // Build sidebar navigation
+                const sidebarNav = document.getElementById('sidebarNav');
+                const feedbackLi = sidebarNav.querySelector('li'); // Keep feedback link
+                sidebarNav.innerHTML = ''; // Clear existing content
+                
+                // Add session links
+                data.sessions.forEach(session => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <a href="#${session.id}">
+                            <span class="session-date-nav">${session.date}</span>
+                            <span class="session-title-nav">${session.title}</span>
+                        </a>
+                    `;
+                    sidebarNav.appendChild(li);
+                });
+                
+                // Re-add feedback link
+                sidebarNav.appendChild(feedbackLi);
+                
+                // Build timeline sessions
+                const timeline = document.getElementById('sessionsTimeline');
+                timeline.innerHTML = '';
+                
+                data.sessions.forEach(session => {
+                    const sessionCard = document.createElement('div');
+                    sessionCard.className = 'session-card';
+                    sessionCard.id = session.id;
+                    
+                    // Build resources HTML
+                    let resourcesHTML = '';
+                    session.resources.forEach(resource => {
+                        const className = resource.type === 'document' ? 'resource-link' : `resource-link ${resource.type}`;
+                        resourcesHTML += `
+                            <a href="${resource.url}" class="${className}" download="${resource.filename}">${resource.name}</a>
+                        `;
+                    });
+                    
+                    sessionCard.innerHTML = `
+                        <div class="session-header">
+                            <span class="session-date">${session.date}</span>
+                            <h2>${session.title}</h2>
+                            <p class="session-description">${session.description}</p>
+                        </div>
+                        <div class="resources">
+                            ${resourcesHTML}
+                        </div>
+                    `;
+                    
+                    timeline.appendChild(sessionCard);
+                });
+                
+                // Re-initialize smooth scroll after loading sessions
+                initializeSmoothScroll();
+                
+            } catch (error) {
+                console.error('Error loading sessions:', error);
+                document.getElementById('sessionsTimeline').innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #e53935;">
+                        <p>⚠️ Error loading sessions. Please make sure sessions.json exists.</p>
+                        <p style="font-size: 0.9em; margin-top: 10px;">Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Initialize smooth scroll functionality
+        function initializeSmoothScroll() {
+            document.querySelectorAll('.sidebar-nav a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all links
+                    document.querySelectorAll('.sidebar-nav a').forEach(l => l.classList.remove('active'));
+                    
+                    // Add active class to clicked link
+                    this.classList.add('active');
+                    
+                    // Smooth scroll to target
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+        }
+        
+        // Load sessions on page load
+        document.addEventListener('DOMContentLoaded', loadSessions);
+        
+        // Smooth scroll and active state management (will be re-initialized after loading sessions)
         document.querySelectorAll('.sidebar-nav a').forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
